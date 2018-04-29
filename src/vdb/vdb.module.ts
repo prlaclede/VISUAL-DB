@@ -1,20 +1,25 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
+import { HttpModule } from '@angular/http';
 import { NgModule } from '@angular/core';
 
-import { AppComponent } from './app.component';
+import { VDBComponent } from './vdb.component';
 import { MaterialModule } from './material/material.module';
+import { SpaceService } from './space/space.service';
 
 @NgModule({
   declarations: [
-    AppComponent
+    VDBComponent,
   ],
   imports: [
+    HttpModule,
     FormsModule,
     BrowserModule,
     MaterialModule
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [
+    SpaceService
+  ],
+  bootstrap: [VDBComponent]
 })
-export class AppModule { }
+export class VDBModule { }

@@ -1,4 +1,4 @@
-<ng-container>
+<div id="vdb-container" [class.vdb-is-mobile]="mobileQuery.matches">
   <mat-toolbar color="primary">
     <button mat-icon-button (click)="snav.toggle()">
       <mat-icon>menu</mat-icon>
@@ -6,10 +6,10 @@
     {{ title }}
   </mat-toolbar>
 
-  <mat-sidenav-container class="example-sidenav-container" [style.marginTop.px]="mobileQuery.matches ? 56 : 0">
-    <mat-sidenav #snav [mode]="mobileQuery.matches ? 'over' : 'side'" [fixedInViewport]="mobileQuery.matches" fixedTopGap="56">
+  <mat-sidenav-container id="vdb-sidenav-container" [style.marginTop.px]="mobileQuery.matches ? 56 : 0">
+    <mat-sidenav id="vdb-sidenav" #snav [mode]="mobileQuery.matches ? 'over' : 'side'" [fixedInViewport]="mobileQuery.matches" fixedTopGap="56">
       <mat-list>
-        <h3 mat-subheader>Folders</h3>
+        <h3 mat-subheader>Spaces</h3>
         <mat-list-item>
           <mat-icon mat-list-icon>folder</mat-icon>
           <h4 mat-line>test</h4>
@@ -25,8 +25,8 @@
       </mat-list>
     </mat-sidenav>
 
-    <mat-sidenav-content>
+    <mat-sidenav-content id="vdb-content-container">
       <p>content</p>
     </mat-sidenav-content>
   </mat-sidenav-container>
-</ng-container>
+</div>
