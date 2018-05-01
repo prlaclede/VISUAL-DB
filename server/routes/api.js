@@ -25,13 +25,20 @@ let response = {
     message: null
 };
 
+// Get columns
+router.get('/columns', (req, res) => {
+    let notesResults = knex.raw("PRAGMA table_info(SPACE);");
+    notesResults.then(function (notes) {
+        res.send(notes);
+    })
+});
+
 // Get notes
 router.get('/notes', (req, res) => {
     let notesResults = knex.select("*").from("SPACE");
     notesResults.then(function (notes) {
-        return notes;
+        res.send(notes);
     })
-
 });
 
 module.exports = router;

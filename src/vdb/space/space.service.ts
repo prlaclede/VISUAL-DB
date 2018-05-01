@@ -8,10 +8,15 @@ export class SpaceService {
 
   constructor(private _http: Http) { }
 
-  result: any;
-  
+  getColumns() {
+    return this._http.get('./api/columns').map(res => {
+      return res.json();
+    });
+  }
+
   getNotes() {
-    return this._http.get('./api/notes')
-      .map(result => this.result = result.json().data);
+    return this._http.get('./api/notes').map(res => {
+      return res.json();
+    });
   }
 }

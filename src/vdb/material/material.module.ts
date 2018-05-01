@@ -5,9 +5,15 @@ import {
   MatCardModule,
   MatListModule,
   MatMenuModule,
+  MatSelectModule,
+  MatGridListModule,
   MatPaginatorModule,
+  MatNativeDateModule,
+  MatDatepickerModule,
   MatProgressBarModule,
+  MatExpansionModule,
   MatSidenavModule,
+  MatInputModule,
   MatFormFieldModule,
   MatSnackBarModule,
   MatTableModule,
@@ -15,7 +21,8 @@ import {
 } from '@angular/material';
 
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 const materialModules = [
   MatIconModule,
@@ -24,10 +31,16 @@ const materialModules = [
   MatCardModule,
   MatListModule,
   MatMenuModule,
+  MatSelectModule,
   MatFormFieldModule,
   MatPaginatorModule,
+  MatGridListModule,
+  MatNativeDateModule,
+  MatDatepickerModule,
   MatProgressBarModule,
+  MatExpansionModule,
   MatSidenavModule,
+  MatInputModule,
   MatSnackBarModule,
   MatTableModule,
   MatToolbarModule,
@@ -42,11 +55,15 @@ const materialModules = [
 @NgModule({
   imports: [
     materialModules,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   exports: [
     materialModules,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   declarations: [],
   providers: [MatIconRegistry],

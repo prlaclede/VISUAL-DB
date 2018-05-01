@@ -35,5 +35,28 @@
 }
 
 #vdb-content-container {
-    background: #f5f5f5
+    background: #f5f5f5;
+}
+
+#notes-container {
+    height: 100%;
+    width: 98%;
+    margin: 20px;
+}
+
+#notes-filters {
+    text-align: center;
+}
+
+#notes-list {
+}
+
+#notes-list > .note-card-item {
+    height: 100%;
+    width: 100%;
+    margin: 5px 0px 5px 0px;
+}
+
+.note-card {
+    width: 100%;
 }
