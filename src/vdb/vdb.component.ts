@@ -38,7 +38,7 @@ export class VDBComponent {
     value: new FormControl()
   });
 
-  notesFormGroup = new FormArray([]);
+  notesFormGroup = new FormGroup({});
 
   constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, private _spaceService: SpaceService, private fb: FormBuilder) {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
@@ -64,16 +64,18 @@ export class VDBComponent {
   initNoteForms() {
     _.each(this.notes, (note) => {
       let noteGroupId = note['ID'];
-      this.notesFormGroup.push(new FormGroup({
-        noteGroupId: new FormArray([
-          new FormControl('DATE'),
-          new FormControl('TITLE'),
-          new FormControl('NOTE')
-        ])
-      }));
+      this.notesFormGroup[noteGroupId] = new FormGroup({
+        date: new FormControl('DATE'),
+        title: new FormControl('TITLE'),
+        note: new FormControl('NOTE')
+      });
     });
 
     console.log(this.notesFormGroup);
+  }
+
+  getDate(dateString) {
+    return new Date(dateString);
   }
 
   applyFilters() {
