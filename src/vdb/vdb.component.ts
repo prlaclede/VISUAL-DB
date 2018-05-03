@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, Input } from '@angular/core';
-import { FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
 import { SpaceService } from './space/space.service';
 import { MediaMatcher } from '@angular/cdk/layout';
 import * as _ from 'lodash';
@@ -38,7 +38,9 @@ export class VDBComponent {
     value: new FormControl()
   });
 
-  constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, private _spaceService: SpaceService) {
+  notesFormGroup = new FormArray([]);
+
+  constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, private _spaceService: SpaceService, private fb: FormBuilder) {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);
@@ -55,38 +57,57 @@ export class VDBComponent {
       console.log(notes);
       this.notes = notes;
       this.filteredNotes = notes;
+      this.initNoteForms();
     });
   }
 
+  initNoteForms() {
+    _.each(this.notes, (note) => {
+      let noteGroupId = note['ID'];
+      this.notesFormGroup.push(new FormGroup({
+        noteGroupId: new FormArray([
+          new FormControl('DATE'),
+          new FormControl('TITLE'),
+          new FormControl('NOTE')
+        ])
+      }));
+    });
+
+    console.log(this.notesFormGroup);
+  }
+
   applyFilters() {
-    console.log('applying filters');
     let filterControls = this.filterOptions.controls;
     let columnSelection = filterControls.column.value;
     let operatorSelection = filterControls.operator.value;
     let valueSelection = filterControls.value.value;
 
+    this.filteredNotes = [];
     let columnSelectionColumn = _.find(this.columns, { 'name': columnSelection });
 
-    this.filteredNotes = _.each(this.notes, function (note) {
-      let notes = Array<any>();
-      console.log(operatorSelection);
-
-      if (operatorSelection === 'lk' && (note[columnSelection].indexOf(valueSelection) >= 0)) {
-        notes.push(note);
+    _.each(this.notes, (note) => {
+      if (operatorSelection === 'lk' && (note[columnSelection] != null && note[columnSelection].indexOf(valueSelection) >= 0)) {
+        this.filteredNotes.push(note);
       } else if (operatorSelection === 'eq' && note[columnSelection] === (valueSelection) >= 0) {
-        notes.push(note);
+        this.filteredNotes.push(note);
       } else if (operatorSelection === 'gt' && note[columnSelection] > (valueSelection)) {
-        notes.push(note);
+        this.filteredNotes.push(note);
       } else if (operatorSelection === 'lt' && note[columnSelection] < (valueSelection)) {
-        notes.push(note);
+        this.filteredNotes.push(note);
       } else if (operatorSelection === 'gtoeq' && note[columnSelection] >= (valueSelection)) {
-        notes.push(note);
+        this.filteredNotes.push(note);
       } else if (operatorSelection === 'ltoeq' && note[columnSelection] <= (valueSelection)) {
-        notes.push(note);
+        this.filteredNotes.push(note);
       }
-
-      return this.notes;
     });
+  }
+
+  clearFilters() {
+    let filterControls = this.filterOptions.controls;
+    filterControls.column.patchValue('');
+    filterControls.operator.patchValue('');
+    filterControls.value.patchValue('');
+    this.filteredNotes = this.notes;
   }
 
   columnChange() {
