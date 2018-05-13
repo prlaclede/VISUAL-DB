@@ -5,7 +5,7 @@
     </button>
     {{ title }}
     <span class="toolbar-spacer"></span>
-    <button mat-raised-button color="accent">New Note</button>
+    <button mat-raised-button color="accent" (click)="addNote()">New Note</button>
   </mat-toolbar>
 
   <mat-sidenav-container id="vdb-sidenav-container" [style.marginTop.px]="mobileQuery.matches ? 56 : 0">
@@ -66,30 +66,60 @@
             <button mat-raised-button color="warn" (click)="clearFilters()">Clear Filters</button>
           </mat-expansion-panel>
         </mat-accordion>
+        <mat-list *ngIf="newNotes != undefined" role="list" id="notes-list" [formGroup]="newNotesFormGroup">
+          <mat-list-item *ngFor="let newNote of newNotes; let i=index" role="listitem" class="note-card-item" [formGroup]="newNotesFormGroup.controls[newNote.ID]">
+            <!-- NEW NOTES -->
+            <mat-card class="new-note-card">
+              <mat-card-header>
+                <mat-card-title>
+                  *{{newNote.ID}}
+                  <mat-form-field>
+                    <input matInput [matDatepicker]="index" formControlName="date" placeholder="Date">
+                    <mat-datepicker-toggle matSuffix [for]="index"></mat-datepicker-toggle>
+                    <mat-datepicker #index></mat-datepicker>
+                  </mat-form-field>
+                  <mat-form-field>
+                    <input matInput formControlName="title" placeholder="Title">
+                  </mat-form-field>
+                </mat-card-title>
+              </mat-card-header>
+              <mat-card-content>
+                <mat-form-field class="full-width">
+                  <textarea matInput formControlName="note" placeholder="Note"></textarea>
+                </mat-form-field>
+              </mat-card-content>
+              <mat-card-actions>
+                <button mat-button (click)="saveNote(newNote.ID)">Save</button>
+                <button mat-button (click)="deleteNewNote(newNote.ID)">Delete</button>
+              </mat-card-actions>
+            </mat-card>
+          </mat-list-item>
+        </mat-list>
         <mat-list role="list" id="notes-list" [formGroup]="notesFormGroup">
-          <mat-list-item *ngFor="let note of filteredNotes" role="listitem" class="note-card-item" [formGroup]="notesFormGroup[note.ID]">
+          <mat-list-item *ngFor="let note of filteredNotes; let i=index" role="listitem" class="note-card-item" [formGroup]="notesFormGroup.controls[note.ID]">
+            <!-- SAVED NOTES -->
             <mat-card class="note-card">
               <mat-card-header>
                 <mat-card-title>
                   {{note.ID}}
                   <mat-form-field>
-                    <input matInput [matDatepicker]="note.ID-picker" [value]="getDate(note.DATE)" formControlName="date" placeholder="Date">
-                    <mat-datepicker-toggle matSuffix [for]="note.ID-picker"></mat-datepicker-toggle>
-                    <mat-datepicker #picker></mat-datepicker>
+                    <input matInput [matDatepicker]="index" formControlName="date" placeholder="Date">
+                    <mat-datepicker-toggle matSuffix [for]="index"></mat-datepicker-toggle>
+                    <mat-datepicker #index></mat-datepicker>
                   </mat-form-field>
                   <mat-form-field>
-                    <input matInput [value]="note.TITLE" formControlName="title" placeholder="Title">
+                    <input matInput formControlName="title" placeholder="Title">
                   </mat-form-field>
                 </mat-card-title>
               </mat-card-header>
               <mat-card-content>
-                <mat-form-field>
-                  <textarea matInput [value]="note.NOTE" formControlName="note" placeholder="Note"></textarea>
+                <mat-form-field class="full-width">
+                  <textarea matInput formControlName="note" placeholder="Note"></textarea>
                 </mat-form-field>
               </mat-card-content>
               <mat-card-actions>
-                <button mat-button>Save</button>
-                <button mat-button>Delete</button>
+                <button mat-button (click)="updateNote(note.ID)">Save</button>
+                <button mat-button (click)="deleteSavedNote(note.ID)">Delete</button>
               </mat-card-actions>
             </mat-card>
           </mat-list-item>

@@ -19,4 +19,16 @@ export class SpaceService {
       return res.json();
     });
   }
+
+  saveNote(note) {
+    return this._http.post('./api/note/save', note).map(res => {
+      return res.json();
+    });
+  }
+
+  updateNote(note) {
+    return this._http.post('./api/note/update', note).map(res => {
+      return res.json();
+    });
+  }
 }

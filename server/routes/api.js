@@ -7,7 +7,8 @@ let knex = require("knex")({
     client: "sqlite3",
     connection: {
         filename: "./local_notes/space.db"
-    }
+    },
+    useNullAsDefault: true
 });
 
 
@@ -39,6 +40,16 @@ router.get('/notes', (req, res) => {
     notesResults.then(function (notes) {
         res.send(notes);
     })
+});
+
+router.post('note/save', function (req, res) {
+    console.log(req);
+    res.send("note save!");
+});
+
+router.post('note/update', function (req, res) {
+    console.log(req);
+    res.send("note updated!");
 });
 
 module.exports = router;

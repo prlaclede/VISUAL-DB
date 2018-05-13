@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, Pipe, PipeTransform } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
 import { SpaceService } from './space/space.service';
 import { MediaMatcher } from '@angular/cdk/layout';
@@ -18,6 +18,7 @@ export class VDBComponent {
 
   notes: Array<any>;
   filteredNotes: Array<any>;
+  newNotes: Array<any>;
   columns: Array<any>;
 
   operators: Array<any> = [
@@ -38,7 +39,9 @@ export class VDBComponent {
     value: new FormControl()
   });
 
+  newNoteIndex: number = 0;
   notesFormGroup = new FormGroup({});
+  newNotesFormGroup = new FormGroup({});
 
   constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, private _spaceService: SpaceService, private fb: FormBuilder) {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
@@ -48,6 +51,7 @@ export class VDBComponent {
 
   ngOnInit() {
     console.log('init');
+    this.newNoteIndex = 0;
     this._spaceService.getColumns().subscribe(columns => {
       console.log(columns);
       this.columns = columns;
@@ -59,19 +63,65 @@ export class VDBComponent {
       this.filteredNotes = notes;
       this.initNoteForms();
     });
+
+    this.newNotes = new Array<any>();
   }
 
   initNoteForms() {
     _.each(this.notes, (note) => {
-      let noteGroupId = note['ID'];
-      this.notesFormGroup[noteGroupId] = new FormGroup({
-        date: new FormControl('DATE'),
-        title: new FormControl('TITLE'),
-        note: new FormControl('NOTE')
+      let noteGroupId = note.ID;
+      this.notesFormGroup.controls[noteGroupId] = new FormGroup({
+        date: new FormControl(this.getDate(note.DATE)),
+        title: new FormControl(note.TITLE),
+        note: new FormControl(note.NOTE)
       });
     });
 
     console.log(this.notesFormGroup);
+  }
+
+  addNote() {
+    console.log('adding note');
+
+    this.newNotesFormGroup.controls[this.newNoteIndex] = new FormGroup({
+      date: new FormControl(new Date()),
+      title: new FormControl(),
+      note: new FormControl()
+    });
+
+    this.newNotes.push({
+      "ID": this.newNoteIndex,
+      "DATE": new Date(),
+      "TITLE": "",
+      "NOTE": "",
+      "PARENT": "",
+    });
+
+    this.newNoteIndex += 1;
+
+    console.log(this.newNotesFormGroup);
+  }
+
+  saveNote(index) {
+    console.log(this.newNotesFormGroup.controls[index].value);
+  }
+
+  updateNote(index) {
+    console.log(this.notesFormGroup.controls[index].value);
+  }
+
+  deleteNewNote(index) {
+    this.newNotes.splice(index, 1);
+
+    console.log(this.newNotes);
+
+    this.newNotesFormGroup.removeControl(index);
+
+    console.log(this.newNotesFormGroup);
+  }
+
+  deleteSavedNote(index) {
+
   }
 
   getDate(dateString) {
@@ -90,7 +140,7 @@ export class VDBComponent {
     _.each(this.notes, (note) => {
       if (operatorSelection === 'lk' && (note[columnSelection] != null && note[columnSelection].indexOf(valueSelection) >= 0)) {
         this.filteredNotes.push(note);
-      } else if (operatorSelection === 'eq' && note[columnSelection] === (valueSelection) >= 0) {
+      } else if (operatorSelection === 'eq' && note[columnSelection] === (valueSelection)) {
         this.filteredNotes.push(note);
       } else if (operatorSelection === 'gt' && note[columnSelection] > (valueSelection)) {
         this.filteredNotes.push(note);

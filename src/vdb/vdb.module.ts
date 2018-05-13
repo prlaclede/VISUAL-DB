@@ -9,7 +9,7 @@ import { SpaceService } from './space/space.service';
 
 @NgModule({
   declarations: [
-    VDBComponent,
+    VDBComponent
   ],
   imports: [
     HttpModule,
@@ -18,7 +18,7 @@ import { SpaceService } from './space/space.service';
     MaterialModule
   ],
   providers: [
-    SpaceService
+    SpaceService    
   ],
   bootstrap: [VDBComponent]
 })
