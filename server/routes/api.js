@@ -42,12 +42,12 @@ router.get('/notes', (req, res) => {
     })
 });
 
-router.post('note/save', function (req, res) {
+router.get('/note/save', function (req, res) {
     console.log(req);
     res.send("note save!");
 });
 
-router.post('note/update', function (req, res) {
+router.get('/note/update', function (req, res) {
     console.log(req);
     res.send("note updated!");
 });

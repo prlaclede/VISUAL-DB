@@ -18,7 +18,6 @@ export class VDBComponent {
 
   notes: Array<any>;
   filteredNotes: Array<any>;
-  newNotes: Array<any>;
   columns: Array<any>;
 
   operators: Array<any> = [
@@ -63,8 +62,6 @@ export class VDBComponent {
       this.filteredNotes = notes;
       this.initNoteForms();
     });
-
-    this.newNotes = new Array<any>();
   }
 
   initNoteForms() {
@@ -88,15 +85,6 @@ export class VDBComponent {
       title: new FormControl(),
       note: new FormControl()
     });
-
-    this.newNotes.push({
-      "ID": this.newNoteIndex,
-      "DATE": new Date(),
-      "TITLE": "",
-      "NOTE": "",
-      "PARENT": "",
-    });
-
     this.newNoteIndex += 1;
 
     console.log(this.newNotesFormGroup);
@@ -104,28 +92,35 @@ export class VDBComponent {
 
   saveNote(index) {
     console.log(this.newNotesFormGroup.controls[index].value);
+    this._spaceService.saveNote(this.newNotesFormGroup.controls[index].value);
   }
 
   updateNote(index) {
     console.log(this.notesFormGroup.controls[index].value);
+    this._spaceService.updateNote(this.notesFormGroup.controls[index].value);
   }
 
   deleteNewNote(index) {
-    this.newNotes.splice(index, 1);
-
-    console.log(this.newNotes);
-
     this.newNotesFormGroup.removeControl(index);
-
+    this.newNoteIndex -= 1;
     console.log(this.newNotesFormGroup);
   }
 
   deleteSavedNote(index) {
+    this.notes.splice(index, 1);
+    this.filteredNotes.splice(index, 1);
 
+    this.notesFormGroup.removeControl(index);
+
+    this._spaceService.archiveNote(index);
   }
 
   getDate(dateString) {
     return new Date(dateString);
+  }
+
+  getNotesArray(controlGroup) {
+    return Object.keys(controlGroup.controls);
   }
 
   applyFilters() {

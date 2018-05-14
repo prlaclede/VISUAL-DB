@@ -21,13 +21,28 @@ export class SpaceService {
   }
 
   saveNote(note) {
-    return this._http.post('./api/note/save', note).map(res => {
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+
+    return this._http.post('./api/note/save', note, options).map(res => {
       return res.json();
     });
   }
 
   updateNote(note) {
-    return this._http.post('./api/note/update', note).map(res => {
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+
+    return this._http.post('./api/note/update', note, options).map(res => {
+      return res.json();
+    });
+  }
+
+  archiveNote(noteId) {
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+
+    return this._http.post('./api/note/archive', noteId, options).map(res => {
       return res.json();
     });
   }
