@@ -60,14 +60,15 @@ export class VDBComponent {
       console.log(notes);
       this.notes = notes;
       this.filteredNotes = notes;
-      this.initNoteForms();
+      this.initNoteForms(notes);
     });
   }
 
-  initNoteForms() {
-    _.each(this.notes, (note) => {
+  initNoteForms(notes) {
+    _.each(notes, (note) => {
       let noteGroupId = note.ID;
       this.notesFormGroup.controls[noteGroupId] = new FormGroup({
+        id: new FormControl(note.ID),
         date: new FormControl(this.getDate(note.DATE)),
         title: new FormControl(note.TITLE),
         note: new FormControl(note.NOTE)
@@ -92,12 +93,18 @@ export class VDBComponent {
 
   saveNote(index) {
     console.log(this.newNotesFormGroup.controls[index].value);
-    this._spaceService.saveNote(this.newNotesFormGroup.controls[index].value);
+    this._spaceService.saveNote(this.newNotesFormGroup.controls[index].value)
+      .subscribe(res => {
+        console.log(res);
+      });
   }
 
   updateNote(index) {
     console.log(this.notesFormGroup.controls[index].value);
-    this._spaceService.updateNote(this.notesFormGroup.controls[index].value);
+    this._spaceService.updateNote(this.notesFormGroup.controls[index].value)
+      .subscribe(res => {
+        console.log(res);
+      })
   }
 
   deleteNewNote(index) {
@@ -107,7 +114,6 @@ export class VDBComponent {
   }
 
   deleteSavedNote(index) {
-    this.notes.splice(index, 1);
     this.filteredNotes.splice(index, 1);
 
     this.notesFormGroup.removeControl(index);
@@ -132,7 +138,9 @@ export class VDBComponent {
     this.filteredNotes = [];
     let columnSelectionColumn = _.find(this.columns, { 'name': columnSelection });
 
-    _.each(this.notes, (note) => {
+    _.each(this.notes, (noteGroup) => {
+      let note = noteGroup.controls.value;
+      console.log(noteGroup);
       if (operatorSelection === 'lk' && (note[columnSelection] != null && note[columnSelection].indexOf(valueSelection) >= 0)) {
         this.filteredNotes.push(note);
       } else if (operatorSelection === 'eq' && note[columnSelection] === (valueSelection)) {
@@ -174,6 +182,10 @@ export class VDBComponent {
       });
       this.filterValueType = 'TEXT';
     }
+  }
+
+  formatString() {
+
   }
 
   ngOnDestroy(): void {
