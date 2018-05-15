@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, Input, Pipe, PipeTransform, HostListener,
 import { FormBuilder, FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
 import { SpaceService } from './space/space.service';
 import { MediaMatcher } from '@angular/cdk/layout';
+import { NGXLogger } from 'ngx-logger';
 import * as _ from 'lodash';
 
 @Component({

@@ -1,3 +1,4 @@
+import { LoggerModule, NgxLoggerLevel } from 'ngx-logger';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
@@ -15,7 +16,8 @@ import { SpaceService } from './space/space.service';
     HttpModule,
     FormsModule,
     BrowserModule,
-    MaterialModule
+    MaterialModule,
+    LoggerModule.forRoot({serverLoggingUrl: '../logs', level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR})
   ],
   providers: [
     SpaceService    
