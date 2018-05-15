@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, Pipe, PipeTransform } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, Pipe, PipeTransform, HostListener, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
 import { SpaceService } from './space/space.service';
 import { MediaMatcher } from '@angular/cdk/layout';
@@ -48,6 +48,25 @@ export class VDBComponent {
     this.mobileQuery.addListener(this._mobileQueryListener);
   }
 
+  @HostListener('document:keyup', ['$event'])
+  handleKeyboardEvent(event: KeyboardEvent) {
+    let key = event.key;
+    let noteId = event.target['attributes'].noteid;
+    let newNote = event.target['attributes'].newNote;
+    console.log(event);
+    if (key === 'Enter' && event.ctrlKey && noteId !== undefined) {
+      let noteIdValue = noteId.value;
+      
+      if (newNote !== undefined) {
+        this.saveNote(noteIdValue);
+      } else {
+        this.updateNote(noteIdValue);
+      }
+    } else if (key === 'i' && event.ctrlKey) {
+      this.addNote();
+    }
+  }
+
   ngOnInit() {
     console.log('init');
     this.newNoteIndex = 0;
@@ -95,7 +114,11 @@ export class VDBComponent {
     console.log(this.newNotesFormGroup.controls[index].value);
     this._spaceService.saveNote(this.newNotesFormGroup.controls[index].value)
       .subscribe(res => {
-        console.log(res);
+        if (res.status === 200) {
+          console.log("save success");
+        } else {
+          console.log("error");
+        }
       });
   }
 
@@ -103,7 +126,11 @@ export class VDBComponent {
     console.log(this.notesFormGroup.controls[index].value);
     this._spaceService.updateNote(this.notesFormGroup.controls[index].value)
       .subscribe(res => {
-        console.log(res);
+        if (res.status === 200) {
+          console.log("update success");
+        } else {
+          console.log("error");
+        }
       })
   }
 

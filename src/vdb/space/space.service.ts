@@ -26,7 +26,7 @@ export class SpaceService {
     let options = new RequestOptions({ headers: headers });
 
     return this._http.post('./api/note/save', note, options).map(res => {
-      return res.json();
+      return res;
     });
   }
 
@@ -36,7 +36,7 @@ export class SpaceService {
     let options = new RequestOptions({ headers: headers });
 
     return this._http.post('./api/note/update', note, options).map(res => {
-      return res.json();
+      return res;
     });
   }
 
@@ -45,7 +45,7 @@ export class SpaceService {
     let options = new RequestOptions({ headers: headers });
 
     return this._http.post('./api/note/archive', noteId, options).map(res => {
-      return res.json();
+      return res;
     });
   }
 }

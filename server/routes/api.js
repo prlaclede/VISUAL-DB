@@ -59,8 +59,10 @@ router.post('/note/save', function (req, res) {
             NOTE: note.note,
             PARENT: note.parent
         });
-    noteSave.then(function (status) {
-        res.sendStatus(status);
+    noteSave.then(function () {
+        res.sendStatus(200);
+    }).catch(function (err) {
+        res.sendStatus(501)
     });
 });
 
@@ -74,9 +76,10 @@ router.post('/note/update', function (req, res) {
             PARENT: note.parent
         });
 
-    noteUpdate.then(function (status) {
-        console.log(status);
-        res.sendStatus(status);
+    noteUpdate.then(function () {
+        res.sendStatus(200);
+    }).catch(function (err) {
+        res.sendStatus(501)
     });
 });
 
