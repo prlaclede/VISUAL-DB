@@ -20,7 +20,7 @@ import { SpaceService } from './space/space.service';
     LoggerModule.forRoot({serverLoggingUrl: '../logs', level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR})
   ],
   providers: [
-    SpaceService    
+    SpaceService 
   ],
   bootstrap: [VDBComponent]
 })

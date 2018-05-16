@@ -20,8 +20,16 @@ export class SpaceService {
     });
   }
 
+  filterNotes(filter) {
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+
+    return this._http.post('./api/filterNotes', filter, options).map(res => {
+      return res.json();
+    });
+  }
+
   saveNote(note) {
-    console.log('saving note');
     let headers = new Headers({ 'Content-Type': 'application/json' });
     let options = new RequestOptions({ headers: headers });
 
@@ -31,7 +39,6 @@ export class SpaceService {
   }
 
   updateNote(note) {
-    console.log('updating note');
     let headers = new Headers({ 'Content-Type': 'application/json' });
     let options = new RequestOptions({ headers: headers });
 

@@ -8,7 +8,8 @@ import * as _ from 'lodash';
 @Component({
   selector: 'visual-db',
   templateUrl: './vdb.component.html',
-  styleUrls: ['./vdb.component.css']
+  styleUrls: ['./vdb.component.css'],
+  providers: [NGXLogger]
 })
 
 export class VDBComponent {
@@ -17,33 +18,37 @@ export class VDBComponent {
 
   private _mobileQueryListener: () => void;
 
-  notes: Array<any>;
-  filteredNotes: Array<any>;
-  columns: Array<any>;
+  notes: Array<any>; //a list of notes pulled from the DB
+  notesStatus: Array<any>; //a list of objects containing various note status (saving, etc...)
+  columns: Array<any>; //a list of column present in the current space
 
+  /* the operators and their values to load into the filters form */
   operators: Array<any> = [
-    { name: 'LIKE', value: 'lk' },
-    { name: 'EQUALS', value: 'eq' },
-    { name: 'GREATER THAN', value: 'gt' },
-    { name: 'LESS THAN', value: 'lt' },
-    { name: 'GREATER THAN OR EQUAL TO', value: 'gtoeq' },
-    { name: 'LESS THAN OR EQUAL TO', value: 'ltoeq' }
+    { name: 'LIKE', value: 'like' },
+    { name: 'EQUALS', value: '=' },
+    { name: 'GREATER THAN', value: '>' },
+    { name: 'LESS THAN', value: '<' },
+    { name: 'GREATER THAN OR EQUAL TO', value: '>=' },
+    { name: 'LESS THAN OR EQUAL TO', value: '<=' }
   ];
-  displayOperators: Array<any> = this.operators;
+  displayOperators: Array<any> = this.operators; //the operators which can change based on column selection
 
-  filterValueType: any = 'TEXT';
+  filterValueType: any = 'TEXT'; //the type of column selected (done because sqlite doesn't have a date type)
 
+  /* the filter options formGroup to capture user input */
   filterOptions = new FormGroup({
     column: new FormControl(),
     operator: new FormControl(),
     value: new FormControl()
   });
 
-  newNoteIndex: number = 0;
-  notesFormGroup = new FormGroup({});
-  newNotesFormGroup = new FormGroup({});
+  newNoteIndex: number = 0; //an index of new notes added to the form
+  notesFormGroup = new FormGroup({}); //a formGroup for all the notes on the page
+  filteredNotesFormGroup = new FormGroup({});
+  newNotesFormGroup = new FormGroup({}); //a formGroup for all the new notes on the page
 
-  constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, private _spaceService: SpaceService, private fb: FormBuilder) {
+  constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, private _spaceService: SpaceService,
+    private fb: FormBuilder, private logger: NGXLogger) {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);
@@ -54,10 +59,9 @@ export class VDBComponent {
     let key = event.key;
     let noteId = event.target['attributes'].noteid;
     let newNote = event.target['attributes'].newNote;
-    console.log(event);
     if (key === 'Enter' && event.ctrlKey && noteId !== undefined) {
       let noteIdValue = noteId.value;
-      
+
       if (newNote !== undefined) {
         this.saveNote(noteIdValue);
       } else {
@@ -69,83 +73,90 @@ export class VDBComponent {
   }
 
   ngOnInit() {
-    console.log('init');
     this.newNoteIndex = 0;
+    this.notesStatus = new Array();
+    this.notesStatus['notes'] = new Array();
+    this.notesStatus['newNotes'] = new Array();
+
+    this.loadColumns();
+
+    this.loadNotes();
+  }
+
+  loadColumns() {
     this._spaceService.getColumns().subscribe(columns => {
-      console.log(columns);
+      this.logger.info(columns);
       this.columns = columns;
     });
+  }
 
+  loadNotes() {
     this._spaceService.getNotes().subscribe(notes => {
-      console.log(notes);
-      this.notes = notes;
-      this.filteredNotes = notes;
+      this.logger.info(notes);
       this.initNoteForms(notes);
     });
   }
 
   initNoteForms(notes) {
     _.each(notes, (note) => {
-      let noteGroupId = note.ID;
-      this.notesFormGroup.controls[noteGroupId] = new FormGroup({
-        id: new FormControl(note.ID),
-        date: new FormControl(this.getDate(note.DATE)),
-        title: new FormControl(note.TITLE),
-        note: new FormControl(note.NOTE)
+      this.notesStatus['notes'][note.ID] = new Array();
+      this.notesStatus['notes'][note.ID]['saving'] = false;
+      this.notesFormGroup.controls[note.ID] = new FormGroup({
+        ID: new FormControl(note.ID),
+        DATE: new FormControl(this.getDate(note.DATE)),
+        TITLE: new FormControl(note.TITLE),
+        NOTE: new FormControl(note.NOTE)
       });
     });
-
-    console.log(this.notesFormGroup);
   }
 
   addNote() {
-    console.log('adding note');
-
+    this.notesStatus['newNotes'][this.newNoteIndex] = new Array();
+    this.notesStatus['newNotes'][this.newNoteIndex]['saving'] = false;
     this.newNotesFormGroup.controls[this.newNoteIndex] = new FormGroup({
-      date: new FormControl(new Date()),
-      title: new FormControl(),
-      note: new FormControl()
+      DATE: new FormControl(new Date()),
+      TITLE: new FormControl(),
+      NOTE: new FormControl()
     });
     this.newNoteIndex += 1;
-
-    console.log(this.newNotesFormGroup);
   }
 
   saveNote(index) {
-    console.log(this.newNotesFormGroup.controls[index].value);
+    this.notesStatus['newNotes'][index]['saving'] = true;
     this._spaceService.saveNote(this.newNotesFormGroup.controls[index].value)
       .subscribe(res => {
         if (res.status === 200) {
-          console.log("save success");
+          this.notesStatus['newNotes'][index]['saving'] = false;
+          this.deleteNewNote(index);
+          this.loadNotes();
         } else {
-          console.log("error");
+          this.logger.error("error");
+          this.notesStatus['newNotes'][index]['saving'] = false;
         }
       });
   }
 
   updateNote(index) {
-    console.log(this.notesFormGroup.controls[index].value);
+    this.notesStatus['notes'][index]['saving'] = true;
     this._spaceService.updateNote(this.notesFormGroup.controls[index].value)
       .subscribe(res => {
         if (res.status === 200) {
-          console.log("update success");
+          this.notesStatus['notes'][index]['saving'] = false;
         } else {
-          console.log("error");
+          this.logger.error("error");
+          this.notesStatus['notes'][index]['saving'] = false;
         }
-      })
+      });
   }
 
   deleteNewNote(index) {
     this.newNotesFormGroup.removeControl(index);
     this.newNoteIndex -= 1;
-    console.log(this.newNotesFormGroup);
   }
 
   deleteSavedNote(index) {
-    this.filteredNotes.splice(index, 1);
-
+    this.filteredNotesFormGroup.removeControl(index);
     this.notesFormGroup.removeControl(index);
-
     this._spaceService.archiveNote(index);
   }
 
@@ -160,28 +171,13 @@ export class VDBComponent {
   applyFilters() {
     let filterControls = this.filterOptions.controls;
     let columnSelection = filterControls.column.value;
-    let operatorSelection = filterControls.operator.value;
-    let valueSelection = filterControls.value.value;
 
-    this.filteredNotes = [];
     let columnSelectionColumn = _.find(this.columns, { 'name': columnSelection });
+    console.log(this.filterOptions.value);
 
-    _.each(this.notes, (noteGroup) => {
-      let note = noteGroup.controls.value;
-      console.log(noteGroup);
-      if (operatorSelection === 'lk' && (note[columnSelection] != null && note[columnSelection].indexOf(valueSelection) >= 0)) {
-        this.filteredNotes.push(note);
-      } else if (operatorSelection === 'eq' && note[columnSelection] === (valueSelection)) {
-        this.filteredNotes.push(note);
-      } else if (operatorSelection === 'gt' && note[columnSelection] > (valueSelection)) {
-        this.filteredNotes.push(note);
-      } else if (operatorSelection === 'lt' && note[columnSelection] < (valueSelection)) {
-        this.filteredNotes.push(note);
-      } else if (operatorSelection === 'gtoeq' && note[columnSelection] >= (valueSelection)) {
-        this.filteredNotes.push(note);
-      } else if (operatorSelection === 'ltoeq' && note[columnSelection] <= (valueSelection)) {
-        this.filteredNotes.push(note);
-      }
+    this._spaceService.filterNotes(this.filterOptions.value).subscribe(filteredNotes => {
+      // this.logger.info(filteredNotes);
+      // this.initNoteForms(filteredNotes);
     });
   }
 
@@ -190,7 +186,7 @@ export class VDBComponent {
     filterControls.column.patchValue('');
     filterControls.operator.patchValue('');
     filterControls.value.patchValue('');
-    this.filteredNotes = this.notes;
+    this.filteredNotesFormGroup = this.notesFormGroup;
   }
 
   columnChange() {

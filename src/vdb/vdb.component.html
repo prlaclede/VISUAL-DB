@@ -52,9 +52,9 @@
               </mat-select>
             </mat-form-field>
             <mat-form-field *ngIf="filterValueType === 'DATE'">
-              <input matInput [matDatepicker]="filter-picker" placeholder="Choose a date">
-              <mat-datepicker-toggle matSuffix [for]="filter-picker"></mat-datepicker-toggle>
-              <mat-datepicker #picker></mat-datepicker>
+              <input matInput [matDatepicker]="filterpicker" placeholder="Choose a date" formControlName="value">
+              <mat-datepicker-toggle matSuffix [for]="filterpicker"></mat-datepicker-toggle>
+              <mat-datepicker #filterpicker></mat-datepicker>
             </mat-form-field>
             <mat-form-field *ngIf="filterValueType === 'INT'">
               <input matInput placeholder="Value" type="number" formControlName="value">
@@ -74,23 +74,24 @@
                 <mat-card-title>
                   ***
                   <mat-form-field>
-                    <input matInput [matDatepicker]="index" formControlName="date" placeholder="Date">
+                    <input matInput [matDatepicker]="index" formControlName="DATE" placeholder="Date">
                     <mat-datepicker-toggle matSuffix [for]="index"></mat-datepicker-toggle>
                     <mat-datepicker #index></mat-datepicker>
                   </mat-form-field>
                   <mat-form-field>
-                    <input matInput formControlName="title" placeholder="Title">
+                    <input matInput formControlName="TITLE" placeholder="Title">
                   </mat-form-field>
                 </mat-card-title>
               </mat-card-header>
               <mat-card-content>
                 <mat-form-field class="full-width">
-                  <textarea matInput formControlName="note" placeholder="Note" newNote="true" attr.noteId="{{newNoteId}}"></textarea>
+                  <textarea matInput formControlName="NOTE" placeholder="Note" newNote="true" attr.noteId="{{newNoteId}}"></textarea>
                 </mat-form-field>
               </mat-card-content>
               <mat-card-actions>
                 <button mat-button (click)="saveNote(newNoteId)">Save</button>
                 <button mat-button (click)="deleteNewNote(newNoteId)">Delete</button>
+                <mat-spinner *ngIf="notesStatus['newNotes'][newNoteId]['saving']" diameter="25" class="note-save-progress"></mat-spinner>
               </mat-card-actions>
             </mat-card>
           </mat-list-item>
@@ -103,23 +104,24 @@
                 <mat-card-title>
                   {{noteId}}
                   <mat-form-field>
-                    <input matInput [matDatepicker]="index" formControlName="date" placeholder="Date">
+                    <input matInput [matDatepicker]="index" formControlName="DATE" placeholder="Date">
                     <mat-datepicker-toggle matSuffix [for]="index"></mat-datepicker-toggle>
                     <mat-datepicker #index></mat-datepicker>
                   </mat-form-field>
                   <mat-form-field>
-                    <input matInput formControlName="title" placeholder="Title">
+                    <input matInput formControlName="TITLE" placeholder="Title">
                   </mat-form-field>
                 </mat-card-title>
               </mat-card-header>
               <mat-card-content>
                 <mat-form-field class="full-width">
-                  <textarea matInput formControlName="note" placeholder="Note" attr.noteId="{{noteId}}"></textarea>
+                  <textarea matInput formControlName="NOTE" placeholder="Note" attr.noteId="{{noteId}}"></textarea>
                 </mat-form-field>
               </mat-card-content>
               <mat-card-actions>
                 <button mat-button (click)="updateNote(noteId)">Save</button>
                 <button mat-button (click)="deleteSavedNote(noteId)">Delete</button>
+                <mat-spinner *ngIf="notesStatus['notes'][noteId]['saving']" diameter="25" class="note-save-progress"></mat-spinner>
               </mat-card-actions>
             </mat-card>
           </mat-list-item>

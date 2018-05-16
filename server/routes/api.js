@@ -50,6 +50,12 @@ router.get('/notes', (req, res) => {
     });
 });
 
+router.post('/filterNotes', (req, res) => {
+    let filter = req.body;
+    let notesSelect = knex.select("*").from("SPACE")
+        .where(filter['column'], filter['operator'], filter['value']);
+});
+
 router.post('/note/save', function (req, res) {
     let note = req.body;
     let noteSave = knex("SPACE")

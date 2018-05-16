@@ -44,6 +44,11 @@
     margin: 20px;
 }
 
+.note-save-progress {
+    float: right;
+    margin: 5px 10px 0px 0px;
+}
+
 #notes-filters {
     text-align: center;
 }
