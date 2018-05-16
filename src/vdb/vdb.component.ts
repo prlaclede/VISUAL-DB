@@ -33,18 +33,25 @@ export class VDBComponent {
   ];
   displayOperators: Array<any> = this.operators; //the operators which can change based on column selection
 
+  sorts: Array<any> = [
+    { name: 'Assending', value: 'ASC' },
+    { name: 'Descending', value: 'DESC' }
+  ];
+
   filterValueType: any = 'TEXT'; //the type of column selected (done because sqlite doesn't have a date type)
 
   /* the filter options formGroup to capture user input */
   filterOptions = new FormGroup({
     column: new FormControl(),
     operator: new FormControl(),
-    value: new FormControl()
+    value: new FormControl(),
+    type: new FormControl(),
+    orderBy: new FormControl(),
+    order: new FormControl()
   });
 
   newNoteIndex: number = 0; //an index of new notes added to the form
   notesFormGroup = new FormGroup({}); //a formGroup for all the notes on the page
-  filteredNotesFormGroup = new FormGroup({});
   newNotesFormGroup = new FormGroup({}); //a formGroup for all the new notes on the page
 
   constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, private _spaceService: SpaceService,
@@ -85,19 +92,19 @@ export class VDBComponent {
 
   loadColumns() {
     this._spaceService.getColumns().subscribe(columns => {
-      this.logger.info(columns);
       this.columns = columns;
     });
   }
 
   loadNotes() {
     this._spaceService.getNotes().subscribe(notes => {
-      this.logger.info(notes);
       this.initNoteForms(notes);
     });
   }
 
   initNoteForms(notes) {
+    this.notesFormGroup = new FormGroup({});
+    console.log(notes);
     _.each(notes, (note) => {
       this.notesStatus['notes'][note.ID] = new Array();
       this.notesStatus['notes'][note.ID]['saving'] = false;
@@ -108,6 +115,7 @@ export class VDBComponent {
         NOTE: new FormControl(note.NOTE)
       });
     });
+    console.log(this.notesFormGroup.controls);
   }
 
   addNote() {
@@ -130,7 +138,6 @@ export class VDBComponent {
           this.deleteNewNote(index);
           this.loadNotes();
         } else {
-          this.logger.error("error");
           this.notesStatus['newNotes'][index]['saving'] = false;
         }
       });
@@ -143,7 +150,6 @@ export class VDBComponent {
         if (res.status === 200) {
           this.notesStatus['notes'][index]['saving'] = false;
         } else {
-          this.logger.error("error");
           this.notesStatus['notes'][index]['saving'] = false;
         }
       });
@@ -155,7 +161,6 @@ export class VDBComponent {
   }
 
   deleteSavedNote(index) {
-    this.filteredNotesFormGroup.removeControl(index);
     this.notesFormGroup.removeControl(index);
     this._spaceService.archiveNote(index);
   }
@@ -171,13 +176,11 @@ export class VDBComponent {
   applyFilters() {
     let filterControls = this.filterOptions.controls;
     let columnSelection = filterControls.column.value;
-
+    let filterOptionsValue = this.filterOptions.value;
     let columnSelectionColumn = _.find(this.columns, { 'name': columnSelection });
-    console.log(this.filterOptions.value);
 
     this._spaceService.filterNotes(this.filterOptions.value).subscribe(filteredNotes => {
-      // this.logger.info(filteredNotes);
-      // this.initNoteForms(filteredNotes);
+      this.initNoteForms(filteredNotes);
     });
   }
 
@@ -186,7 +189,11 @@ export class VDBComponent {
     filterControls.column.patchValue('');
     filterControls.operator.patchValue('');
     filterControls.value.patchValue('');
-    this.filteredNotesFormGroup = this.notesFormGroup;
+    filterControls.type.patchValue('');
+    filterControls.orderBy.patchValue('');
+    filterControls.order.patchValue('');
+    
+    this.loadNotes();
   }
 
   columnChange() {
@@ -206,6 +213,8 @@ export class VDBComponent {
       });
       this.filterValueType = 'TEXT';
     }
+
+    this.filterOptions.controls.type.patchValue(this.filterValueType);
   }
 
   formatString() {

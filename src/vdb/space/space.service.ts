@@ -30,6 +30,7 @@ export class SpaceService {
   }
 
   saveNote(note) {
+    console.log(note);
     let headers = new Headers({ 'Content-Type': 'application/json' });
     let options = new RequestOptions({ headers: headers });
 
@@ -39,6 +40,7 @@ export class SpaceService {
   }
 
   updateNote(note) {
+    console.log(note);
     let headers = new Headers({ 'Content-Type': 'application/json' });
     let options = new RequestOptions({ headers: headers });
 

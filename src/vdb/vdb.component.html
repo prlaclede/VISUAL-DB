@@ -40,10 +40,18 @@
               </mat-panel-description>
             </mat-expansion-panel-header>
             <mat-form-field>
+              <mat-select placeholder="Order By" formControlName="orderBy">
+                <mat-option *ngFor="let column of columns" [value]="column.name">{{ column.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+              <mat-select placeholder="Order" formControlName="order">
+                <mat-option *ngFor="let sort of sorts" [value]="sort.value">{{ sort.name }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field>
               <mat-select placeholder="Column" formControlName="column" (change)="columnChange()">
-                <mat-option *ngFor="let column of columns" [value]="column.name">
-                  {{ column.name }}
-                </mat-option>
+                <mat-option *ngFor="let column of columns" [value]="column.name">{{ column.name }}</mat-option>
               </mat-select>
             </mat-form-field>
             <mat-form-field>
@@ -67,19 +75,20 @@
           </mat-expansion-panel>
         </mat-accordion>
         <mat-list *ngIf="newNoteIndex > 0" role="list" id="notes-list" [formGroup]="newNotesFormGroup">
-          <mat-list-item *ngFor="let newNoteId of getNotesArray(newNotesFormGroup); let i=index" role="listitem" class="note-card-item" [formGroup]="newNotesFormGroup.controls[newNoteId]">
+          <mat-list-item *ngFor="let newNoteId of getNotesArray(newNotesFormGroup); let i=index" role="listitem" class="note-card-item"
+            [formGroup]="newNotesFormGroup.controls[newNoteId]">
             <!-- NEW NOTES -->
             <mat-card class="new-note-card">
               <mat-card-header>
                 <mat-card-title>
                   ***
                   <mat-form-field>
-                    <input matInput [matDatepicker]="index" formControlName="DATE" placeholder="Date">
+                    <input matInput [matDatepicker]="index" formControlName="DATE" placeholder="Date" newNote="true" attr.noteId="{{newNoteId}}">
                     <mat-datepicker-toggle matSuffix [for]="index"></mat-datepicker-toggle>
                     <mat-datepicker #index></mat-datepicker>
                   </mat-form-field>
                   <mat-form-field>
-                    <input matInput formControlName="TITLE" placeholder="Title">
+                    <input matInput formControlName="TITLE" placeholder="Title" newNote="true" attr.noteId="{{newNoteId}}">
                   </mat-form-field>
                 </mat-card-title>
               </mat-card-header>
@@ -104,12 +113,12 @@
                 <mat-card-title>
                   {{noteId}}
                   <mat-form-field>
-                    <input matInput [matDatepicker]="index" formControlName="DATE" placeholder="Date">
+                    <input matInput [matDatepicker]="index" formControlName="DATE" placeholder="Date" attr.noteId="{{noteId}}">
                     <mat-datepicker-toggle matSuffix [for]="index"></mat-datepicker-toggle>
                     <mat-datepicker #index></mat-datepicker>
                   </mat-form-field>
                   <mat-form-field>
-                    <input matInput formControlName="TITLE" placeholder="Title">
+                    <input matInput formControlName="TITLE" placeholder="Title" attr.noteId="{{noteId}}">
                   </mat-form-field>
                 </mat-card-title>
               </mat-card-header>

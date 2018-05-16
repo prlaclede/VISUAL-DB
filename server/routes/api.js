@@ -52,40 +52,67 @@ router.get('/notes', (req, res) => {
 
 router.post('/filterNotes', (req, res) => {
     let filter = req.body;
-    let notesSelect = knex.select("*").from("SPACE")
-        .where(filter['column'], filter['operator'], filter['value']);
+    console.log(filter);
+
+    let notesSelect = knex.select("*").from("SPACE");
+
+    let noteFilterValue = filter['value'];
+
+    if (filter['column'] && filter['operator'] && filter['value']) {
+        if (filter['type'] === 'DATE') {
+            noteFilterValue = "datetime('" + filter['value'] + "')";
+        }
+
+        if (filter['operator'] === 'like') {
+            noteFilterValue = "%" + noteFilterValue + "%";
+        }
+
+        notesSelect = notesSelect
+            .where(filter['column'], filter['operator'], noteFilterValue);
+    }
+
+    if (filter['orderBy'] && filter['order']) {
+        notesSelect = notesSelect
+            .orderBy(filter['orderBy'], filter['order'])
+    }
+
+    notesSelect.then(function (filteredNotes) {
+        res.send(filteredNotes);
+    });
 });
 
 router.post('/note/save', function (req, res) {
     let note = req.body;
     let noteSave = knex("SPACE")
         .insert({
-            DATE: note.date,
-            TITLE: note.title,
-            NOTE: note.note,
-            PARENT: note.parent
+            DATE: note.DATE,
+            TITLE: note.TITLE,
+            NOTE: note.NOTE,
+            PARENT: note.PARENT
         });
     noteSave.then(function () {
         res.sendStatus(200);
     }).catch(function (err) {
-        res.sendStatus(501)
+        console.log(err);
+        res.sendStatus(500)
     });
 });
 
 router.post('/note/update', function (req, res) {
     let note = req.body;
-    let noteUpdate = knex("SPACE").where("ID", "=", note.id)
+    let noteUpdate = knex("SPACE").where("ID", "=", note.ID)
         .update({
-            DATE: note.date,
-            TITLE: note.title,
-            NOTE: note.note,
-            PARENT: note.parent
+            DATE: note.DATA,
+            TITLE: note.TITLE,
+            NOTE: note.NOTE,
+            PARENT: note.PARENT
         });
 
     noteUpdate.then(function () {
         res.sendStatus(200);
     }).catch(function (err) {
-        res.sendStatus(501)
+        console.log(err);
+        res.sendStatus(500)
     });
 });
 
