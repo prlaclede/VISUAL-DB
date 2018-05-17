@@ -44,7 +44,7 @@ router.get('/columns', (req, res) => {
 
 // Get notes
 router.get('/notes', (req, res) => {
-    let notesResults = knex.select("*").from("SPACE");
+    let notesResults = knex.select("*").from("SPACE").orderBy('ID', 'DESC');;
     notesResults.then(function (notes) {
         res.send(notes);
     });
@@ -52,7 +52,6 @@ router.get('/notes', (req, res) => {
 
 router.post('/filterNotes', (req, res) => {
     let filter = req.body;
-    console.log(filter);
 
     let notesSelect = knex.select("*").from("SPACE");
 
@@ -73,7 +72,9 @@ router.post('/filterNotes', (req, res) => {
 
     if (filter['orderBy'] && filter['order']) {
         notesSelect = notesSelect
-            .orderBy(filter['orderBy'], filter['order'])
+            .orderBy(filter['orderBy'], filter['order']);
+    } else {
+        notesSelect = notesSelect.orderBy('ID', 'DESC');
     }
 
     notesSelect.then(function (filteredNotes) {
@@ -107,6 +108,18 @@ router.post('/note/update', function (req, res) {
             NOTE: note.NOTE,
             PARENT: note.PARENT
         });
+
+    noteUpdate.then(function () {
+        res.sendStatus(200);
+    }).catch(function (err) {
+        console.log(err);
+        res.sendStatus(500)
+    });
+});
+
+router.post('/note/archive', function (req, res) {
+    let note = req.body;
+    let noteUpdate = knex("SPACE").where("ID", "=", note.ID).del();
 
     noteUpdate.then(function () {
         res.sendStatus(200);

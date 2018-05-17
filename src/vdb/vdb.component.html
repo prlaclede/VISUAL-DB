@@ -83,18 +83,18 @@
                 <mat-card-title>
                   ***
                   <mat-form-field>
-                    <input matInput [matDatepicker]="index" formControlName="DATE" placeholder="Date" newNote="true" attr.noteId="{{newNoteId}}">
+                    <input matInput [matDatepicker]="index" formControlName="DATE" placeholder="Date" newNote="true" attr.newNoteId="{{newNoteId}}">
                     <mat-datepicker-toggle matSuffix [for]="index"></mat-datepicker-toggle>
                     <mat-datepicker #index></mat-datepicker>
                   </mat-form-field>
                   <mat-form-field>
-                    <input matInput formControlName="TITLE" placeholder="Title" newNote="true" attr.noteId="{{newNoteId}}">
+                    <input matInput formControlName="TITLE" placeholder="Title" newNote="true" attr.newNoteId="{{newNoteId}}">
                   </mat-form-field>
                 </mat-card-title>
               </mat-card-header>
               <mat-card-content>
                 <mat-form-field class="full-width">
-                  <textarea matInput formControlName="NOTE" placeholder="Note" newNote="true" attr.noteId="{{newNoteId}}"></textarea>
+                  <textarea matInput id="newNote-{{newNoteId}}" class="newNote" formControlName="NOTE" placeholder="Note" newNote="true" attr.newNoteId="{{newNoteId}}"></textarea>
                 </mat-form-field>
               </mat-card-content>
               <mat-card-actions>
@@ -106,31 +106,31 @@
           </mat-list-item>
         </mat-list>
         <mat-list role="list" id="notes-list" [formGroup]="notesFormGroup">
-          <mat-list-item *ngFor="let noteId of getNotesArray(notesFormGroup); let i=index" role="listitem" class="note-card-item" [formGroup]="notesFormGroup.controls[noteId]">
+          <mat-list-item *ngFor="let note of notes; let i=index" role="listitem" class="note-card-item" [formGroup]="notesFormGroup.controls[note.ID]">
             <!-- SAVED NOTES -->
             <mat-card class="note-card">
               <mat-card-header>
                 <mat-card-title>
-                  {{noteId}}
+                  {{note.ID}}
                   <mat-form-field>
-                    <input matInput [matDatepicker]="index" formControlName="DATE" placeholder="Date" attr.noteId="{{noteId}}">
+                    <input matInput [matDatepicker]="index" formControlName="DATE" placeholder="Date" attr.noteId="{{notes.ID}}">
                     <mat-datepicker-toggle matSuffix [for]="index"></mat-datepicker-toggle>
                     <mat-datepicker #index></mat-datepicker>
                   </mat-form-field>
                   <mat-form-field>
-                    <input matInput formControlName="TITLE" placeholder="Title" attr.noteId="{{noteId}}">
+                    <input matInput formControlName="TITLE" placeholder="Title" attr.noteId="{{note.ID}}">
                   </mat-form-field>
                 </mat-card-title>
               </mat-card-header>
               <mat-card-content>
                 <mat-form-field class="full-width">
-                  <textarea matInput formControlName="NOTE" placeholder="Note" attr.noteId="{{noteId}}"></textarea>
+                  <textarea matInput formControlName="NOTE" placeholder="Note" attr.noteId="{{note.ID}}"></textarea>
                 </mat-form-field>
               </mat-card-content>
               <mat-card-actions>
-                <button mat-button (click)="updateNote(noteId)">Save</button>
-                <button mat-button (click)="deleteSavedNote(noteId)">Delete</button>
-                <mat-spinner *ngIf="notesStatus['notes'][noteId]['saving']" diameter="25" class="note-save-progress"></mat-spinner>
+                <button mat-button (click)="updateNote(note.ID)">Save</button>
+                <button mat-button (click)="deleteSavedNote(note.ID, index)">Delete</button>
+                <mat-spinner *ngIf="notesStatus['notes'][note.ID]['saving']" diameter="25" class="note-save-progress"></mat-spinner>
               </mat-card-actions>
             </mat-card>
           </mat-list-item>

@@ -18,7 +18,8 @@ export class VDBComponent {
 
   private _mobileQueryListener: () => void;
 
-  notes: Array<any>; //a list of notes pulled from the DB
+  notes: Array<any>; //a list of notes loaded from the DB, used some orderBy can be maintained
+  newNoteElementReference: Array<any>; //a list of elements used to set focus on adding of a new note
   notesStatus: Array<any>; //a list of objects containing various note status (saving, etc...)
   columns: Array<any>; //a list of column present in the current space
 
@@ -64,7 +65,7 @@ export class VDBComponent {
   @HostListener('document:keyup', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
     let key = event.key;
-    let noteId = event.target['attributes'].noteid;
+    let noteId = event.target['attributes'].noteId || event.target['attributes'].newNoteId;
     let newNote = event.target['attributes'].newNote;
     if (key === 'Enter' && event.ctrlKey && noteId !== undefined) {
       let noteIdValue = noteId.value;
@@ -90,6 +91,13 @@ export class VDBComponent {
     this.loadNotes();
   }
 
+  ngAfterContentChecked() {
+    if (document.querySelector('.newNote')) {
+      var noteTextArea = document.querySelector('.newNote');
+      document.getElementById(noteTextArea.id).focus();
+    }
+  }
+
   loadColumns() {
     this._spaceService.getColumns().subscribe(columns => {
       this.columns = columns;
@@ -103,6 +111,7 @@ export class VDBComponent {
   }
 
   initNoteForms(notes) {
+    this.notes = notes;
     this.notesFormGroup = new FormGroup({});
     console.log(notes);
     _.each(notes, (note) => {
@@ -126,6 +135,7 @@ export class VDBComponent {
       TITLE: new FormControl(),
       NOTE: new FormControl()
     });
+
     this.newNoteIndex += 1;
   }
 
@@ -160,9 +170,12 @@ export class VDBComponent {
     this.newNoteIndex -= 1;
   }
 
-  deleteSavedNote(index) {
-    this.notesFormGroup.removeControl(index);
-    this._spaceService.archiveNote(index);
+  deleteSavedNote(index, noteId) {
+    console.log(index);
+    console.log(noteId);
+    this.notes = this.notes.splice(index, 1);
+    this.notesFormGroup.removeControl(noteId);
+    this._spaceService.archiveNote(noteId);
   }
 
   getDate(dateString) {
@@ -192,7 +205,7 @@ export class VDBComponent {
     filterControls.type.patchValue('');
     filterControls.orderBy.patchValue('');
     filterControls.order.patchValue('');
-    
+
     this.loadNotes();
   }
 
