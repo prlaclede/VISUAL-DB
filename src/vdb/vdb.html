@@ -74,7 +74,7 @@
             <button mat-raised-button color="warn" (click)="clearFilters()">Clear Filters</button>
           </mat-expansion-panel>
         </mat-accordion>
-        <mat-list *ngIf="newNoteIndex > 0" role="list" id="notes-list" [formGroup]="newNotesFormGroup">
+        <mat-list *ngIf="newNoteIndex > 0" role="list" id="notes-list">
           <mat-list-item *ngFor="let newNoteId of getNotesArray(newNotesFormGroup); let i=index" role="listitem" class="note-card-item"
             [formGroup]="newNotesFormGroup.controls[newNoteId]">
             <!-- NEW NOTES -->
@@ -100,7 +100,7 @@
               <mat-card-actions>
                 <button mat-button (click)="saveNote(newNoteId)">Save</button>
                 <button mat-button (click)="deleteNewNote(newNoteId)">Delete</button>
-                <mat-spinner *ngIf="notesStatus['newNotes'][newNoteId]['saving']" diameter="25" class="note-save-progress"></mat-spinner>
+                <mat-spinner *ngIf="noteProperties['newNotes'][newNoteId]['saving']" diameter="25" class="note-save-progress"></mat-spinner>
               </mat-card-actions>
             </mat-card>
           </mat-list-item>
@@ -108,7 +108,8 @@
         <mat-list role="list" id="notes-list" [formGroup]="notesFormGroup">
           <mat-list-item *ngFor="let note of notes; let i=index" role="listitem" class="note-card-item" [formGroup]="notesFormGroup.controls[note.ID]">
             <!-- SAVED NOTES -->
-            <mat-card class="note-card">
+            <note [noteFG]="notesFormGroup.controls[note.ID]" [noteProperties]="noteProperties['notes'][note.ID]"></note>
+            <!-- <mat-card class="note-card">
               <mat-card-header>
                 <mat-card-title>
                   {{note.ID}}
@@ -132,7 +133,7 @@
                 <button mat-button (click)="deleteSavedNote(note.ID, index)">Delete</button>
                 <mat-spinner *ngIf="notesStatus['notes'][note.ID]['saving']" diameter="25" class="note-save-progress"></mat-spinner>
               </mat-card-actions>
-            </mat-card>
+            </mat-card> -->
           </mat-list-item>
         </mat-list>
       </div>

@@ -5,12 +5,14 @@ import { HttpModule } from '@angular/http';
 import { NgModule } from '@angular/core';
 
 import { VDBComponent } from './vdb.component';
+import { NoteComponent } from './note/note.component';
 import { MaterialModule } from './material/material.module';
 import { SpaceService } from './space/space.service';
 
 @NgModule({
   declarations: [
-    VDBComponent
+    VDBComponent,
+    NoteComponent
   ],
   imports: [
     HttpModule,

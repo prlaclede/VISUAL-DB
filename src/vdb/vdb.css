@@ -59,16 +59,6 @@
     margin: 5px 0px 5px 0px;
 }
 
-.note-card, .new-note-card {
-    width: 100%;
-    background: #ddeefc;
-}
-
-.note-card > .mat-card-content,
-.new-note-card > .mat-card-content {
-    margin: 0px;
-}
-
 .full-width {
     width: 100%;
 }

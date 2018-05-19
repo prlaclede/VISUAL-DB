@@ -1,14 +1,16 @@
-import { ChangeDetectorRef, Component, Input, Pipe, PipeTransform, HostListener, ElementRef } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray, FormControl, Validators } from '@angular/forms';
+import { ChangeDetectorRef, Component, Input, HostListener, ElementRef } from '@angular/core';
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { SpaceService } from './space/space.service';
 import { MediaMatcher } from '@angular/cdk/layout';
 import { NGXLogger } from 'ngx-logger';
 import * as _ from 'lodash';
 
+import { NoteComponent } from './note/note.component';
+
 @Component({
   selector: 'visual-db',
-  templateUrl: './vdb.component.html',
-  styleUrls: ['./vdb.component.css'],
+  templateUrl: './vdb.html',
+  styleUrls: ['./vdb.css'],
   providers: [NGXLogger]
 })
 
@@ -20,7 +22,7 @@ export class VDBComponent {
 
   notes: Array<any>; //a list of notes loaded from the DB, used some orderBy can be maintained
   newNoteElementReference: Array<any>; //a list of elements used to set focus on adding of a new note
-  notesStatus: Array<any>; //a list of objects containing various note status (saving, etc...)
+  noteProperties: Array<any>; //a list of objects containing various note status (saving, etc...)
   columns: Array<any>; //a list of column present in the current space
 
   /* the operators and their values to load into the filters form */
@@ -82,9 +84,9 @@ export class VDBComponent {
 
   ngOnInit() {
     this.newNoteIndex = 0;
-    this.notesStatus = new Array();
-    this.notesStatus['notes'] = new Array();
-    this.notesStatus['newNotes'] = new Array();
+    this.noteProperties = new Array();
+    this.noteProperties['notes'] = new Array();
+    this.noteProperties['newNotes'] = new Array();
 
     this.loadColumns();
 
@@ -113,10 +115,9 @@ export class VDBComponent {
   initNoteForms(notes) {
     this.notes = notes;
     this.notesFormGroup = new FormGroup({});
-    console.log(notes);
     _.each(notes, (note) => {
-      this.notesStatus['notes'][note.ID] = new Array();
-      this.notesStatus['notes'][note.ID]['saving'] = false;
+      this.noteProperties['notes'][note.ID] = new Array();
+      this.noteProperties['notes'][note.ID]['saving'] = false;
       this.notesFormGroup.controls[note.ID] = new FormGroup({
         ID: new FormControl(note.ID),
         DATE: new FormControl(this.getDate(note.DATE)),
@@ -124,12 +125,11 @@ export class VDBComponent {
         NOTE: new FormControl(note.NOTE)
       });
     });
-    console.log(this.notesFormGroup.controls);
   }
 
   addNote() {
-    this.notesStatus['newNotes'][this.newNoteIndex] = new Array();
-    this.notesStatus['newNotes'][this.newNoteIndex]['saving'] = false;
+    this.noteProperties['newNotes'][this.newNoteIndex] = new Array();
+    this.noteProperties['newNotes'][this.newNoteIndex]['saving'] = false;
     this.newNotesFormGroup.controls[this.newNoteIndex] = new FormGroup({
       DATE: new FormControl(new Date()),
       TITLE: new FormControl(),
@@ -140,27 +140,27 @@ export class VDBComponent {
   }
 
   saveNote(index) {
-    this.notesStatus['newNotes'][index]['saving'] = true;
+    this.noteProperties['newNotes'][index]['saving'] = true;
     this._spaceService.saveNote(this.newNotesFormGroup.controls[index].value)
       .subscribe(res => {
         if (res.status === 200) {
-          this.notesStatus['newNotes'][index]['saving'] = false;
+          this.noteProperties['newNotes'][index]['saving'] = false;
           this.deleteNewNote(index);
           this.loadNotes();
         } else {
-          this.notesStatus['newNotes'][index]['saving'] = false;
+          this.noteProperties['newNotes'][index]['saving'] = false;
         }
       });
   }
 
   updateNote(index) {
-    this.notesStatus['notes'][index]['saving'] = true;
+    this.noteProperties['notes'][index]['saving'] = true;
     this._spaceService.updateNote(this.notesFormGroup.controls[index].value)
       .subscribe(res => {
         if (res.status === 200) {
-          this.notesStatus['notes'][index]['saving'] = false;
+          this.noteProperties['notes'][index]['saving'] = false;
         } else {
-          this.notesStatus['notes'][index]['saving'] = false;
+          this.noteProperties['notes'][index]['saving'] = false;
         }
       });
   }
@@ -171,8 +171,6 @@ export class VDBComponent {
   }
 
   deleteSavedNote(index, noteId) {
-    console.log(index);
-    console.log(noteId);
     this.notes = this.notes.splice(index, 1);
     this.notesFormGroup.removeControl(noteId);
     this._spaceService.archiveNote(noteId);
@@ -230,16 +228,7 @@ export class VDBComponent {
     this.filterOptions.controls.type.patchValue(this.filterValueType);
   }
 
-  formatString() {
-
-  }
-
   ngOnDestroy(): void {
     this.mobileQuery.removeListener(this._mobileQueryListener);
   }
 }
-
-//Visual DB
-//Space
-//Note
-//Tag

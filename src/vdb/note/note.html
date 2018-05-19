@@ -1,0 +1,25 @@
+<mat-card class="note-card" [formGroup]="noteFG">
+    <mat-card-header>
+        <mat-card-title>
+            {{noteFG.ID}}
+            <mat-form-field>
+                <input matInput [matDatepicker]="index" formControlName="DATE" placeholder="Date" attr.noteId="{{noteFG.ID}}">
+                <mat-datepicker-toggle matSuffix [for]="index"></mat-datepicker-toggle>
+                <mat-datepicker #index></mat-datepicker>
+            </mat-form-field>
+            <mat-form-field>
+                <input matInput formControlName="TITLE" placeholder="Title" attr.noteId="{{noteFG.ID}}">
+            </mat-form-field>
+        </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+        <mat-form-field class="full-width">
+            <textarea matInput formControlName="NOTE" placeholder="Note" attr.noteId="{{noteFG.ID}}"></textarea>
+        </mat-form-field>
+    </mat-card-content>
+    <mat-card-actions>
+        <button mat-button (click)="updateNote(noteFG.controls.ID.value)">Save</button>
+        <button mat-button (click)="deleteSavedNote(noteFG, index)">Delete</button>
+        <mat-spinner *ngIf="noteProperties['saving']" diameter="25" class="note-save-progress"></mat-spinner>
+    </mat-card-actions>
+</mat-card>
