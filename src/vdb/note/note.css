@@ -1,6 +1,5 @@
 .note-card, .new-note-card {
     width: 100%;
-    background: #ddeefc;
 }
 
 .note-card > .mat-card-content,
@@ -11,4 +10,12 @@
 .note-save-progress {
     float: right;
     margin: 5px 10px 0px 0px;
+}
+
+.note-card[newNote='true'] {
+    background: #f9efff;
+}
+
+.note-card[newNote='false'] {
+    background: #eff2ff;
 }

@@ -5,7 +5,7 @@
     </button>
     {{ title }}
     <span class="toolbar-spacer"></span>
-    <button mat-raised-button color="accent" (click)="addNote()">New Note</button>
+    <button mat-raised-button color="accent" (click)="_ns.addNote()">New Note</button>
   </mat-toolbar>
 
   <mat-sidenav-container id="vdb-sidenav-container" [style.marginTop.px]="mobileQuery.matches ? 56 : 0">

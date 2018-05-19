@@ -26,6 +26,7 @@ export class NoteService {
         this.noteProperties['newNotes'] = new Array();
 
         this.notes = notes;
+        console.log(notes);
         this.notesFormGroup = new FormGroup({});
         _.each(notes, (note) => {
             this.noteProperties['notes'][note.ID] = new Array();
@@ -112,13 +113,14 @@ export class NoteService {
             });
     }
 
-    deleteNewNote(index) {
-        this.newNotesFormGroup.removeControl(index);
+    deleteNewNote(noteId) {
+        this.newNotesFormGroup.removeControl(noteId);
         this.newNoteIndex -= 1;
     }
 
-    deleteSavedNote(index, noteId) {
-        this.notes = this.notes.splice(index, 1);
+    deleteSavedNote(noteId) {
+        let noteIndex = _.findKey(this.notes, {ID: noteId});
+        this.notes.splice(noteIndex, 1);
         this.notesFormGroup.removeControl(noteId);
         this._ss.archiveNote(noteId);
     }

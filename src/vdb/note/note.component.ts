@@ -5,6 +5,7 @@ import { NGXLogger } from 'ngx-logger';
 import * as _ from 'lodash';
 
 import { SpaceService } from '../space/space.service';
+import { NoteService } from '../note/note.service';
 import { CommonService } from '../common/common.service';
 
 @Component({
@@ -22,7 +23,7 @@ export class NoteComponent {
 
     noteAttributes: any;
     
-    constructor(private logger: NGXLogger, private _cs: CommonService, private _ss: SpaceService, ) {
+    constructor(private logger: NGXLogger, private _cs: CommonService, private _ss: SpaceService, private _ns: NoteService) {
     }
 
     ngOnInit() {

@@ -21,9 +21,10 @@
         </mat-form-field>
     </mat-card-content>
     <mat-card-actions>
-        <button *ngIf="newNote" mat-button (click)="save(noteAttributes.ID.value)">Save</button>
-        <button *ngIf="!newNote" mat-button (click)="updateNote(noteAttributes.ID.value)">Update</button>
-        <button mat-button (click)="deleteSavedNote(noteFG, index)">Delete</button>
+        <button *ngIf="newNote" mat-button (click)="_ns.saveNote(noteAttributes.ID.value)">Save</button>
+        <button *ngIf="!newNote" mat-button (click)="_ns.updateNote(noteAttributes.ID.value)">Update</button>
+        <button *ngIf="newNote" mat-button (click)="_ns.deleteNewNote(noteAttributes.ID.value)">Delete</button>
+        <button *ngIf="!newNote" mat-button (click)="_ns.deleteSavedNote(noteAttributes.ID.value)">Delete</button>
         <mat-spinner *ngIf="noteProperties['saving']" diameter="25" class="note-save-progress"></mat-spinner>
     </mat-card-actions>
 </mat-card>

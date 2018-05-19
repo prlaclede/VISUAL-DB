@@ -119,9 +119,9 @@ router.post('/note/update', function (req, res) {
 
 router.post('/note/archive', function (req, res) {
     let note = req.body;
-    let noteUpdate = knex("SPACE").where("ID", "=", note.ID).del();
+    let noteArchive = knex("SPACE").where("ID", "=", note.ID).del();
 
-    noteUpdate.then(function () {
+    noteArchive.then(function () {
         res.sendStatus(200);
     }).catch(function (err) {
         console.log(err);
