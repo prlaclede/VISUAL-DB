@@ -91,8 +91,8 @@ router.post('/note/save', function (req, res) {
             NOTE: note.NOTE,
             PARENT: note.PARENT
         });
-    noteSave.then(function () {
-        res.sendStatus(200);
+    noteSave.then(function (noteId) {
+        res.send(noteId);
     }).catch(function (err) {
         console.log(err);
         res.sendStatus(500)

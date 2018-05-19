@@ -2,11 +2,14 @@ import { Injectable } from '@angular/core';
 import { Http, Headers, RequestOptions } from '@angular/http';
 import 'rxjs/add/operator/map';
 
+import { CommonService } from '../common/common.service';
 
 @Injectable()
 export class SpaceService {
 
   constructor(private _http: Http) { }
+
+  columns: Array<any>; //a list of column present in the current space
 
   getColumns() {
     return this._http.get('./api/columns').map(res => {

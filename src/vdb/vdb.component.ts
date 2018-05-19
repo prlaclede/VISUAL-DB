@@ -1,11 +1,14 @@
 import { ChangeDetectorRef, Component, Input, HostListener, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
-import { SpaceService } from './space/space.service';
 import { MediaMatcher } from '@angular/cdk/layout';
 import { NGXLogger } from 'ngx-logger';
 import * as _ from 'lodash';
 
 import { NoteComponent } from './note/note.component';
+
+import { SpaceService } from './space/space.service';
+import { NoteService } from './note/note.service';
+import { CommonService } from './common/common.service';
 
 @Component({
   selector: 'visual-db',
@@ -19,11 +22,6 @@ export class VDBComponent {
   title = 'Visual DB';
 
   private _mobileQueryListener: () => void;
-
-  notes: Array<any>; //a list of notes loaded from the DB, used some orderBy can be maintained
-  newNoteElementReference: Array<any>; //a list of elements used to set focus on adding of a new note
-  noteProperties: Array<any>; //a list of objects containing various note status (saving, etc...)
-  columns: Array<any>; //a list of column present in the current space
 
   /* the operators and their values to load into the filters form */
   operators: Array<any> = [
@@ -53,12 +51,9 @@ export class VDBComponent {
     order: new FormControl()
   });
 
-  newNoteIndex: number = 0; //an index of new notes added to the form
-  notesFormGroup = new FormGroup({}); //a formGroup for all the notes on the page
-  newNotesFormGroup = new FormGroup({}); //a formGroup for all the new notes on the page
-
-  constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, private _spaceService: SpaceService,
-    private fb: FormBuilder, private logger: NGXLogger) {
+  constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher,
+    private fb: FormBuilder, private logger: NGXLogger,
+    private _cs: CommonService, private _ss: SpaceService, private _ns: NoteService, ) {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);
@@ -67,27 +62,29 @@ export class VDBComponent {
   @HostListener('document:keyup', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
     let key = event.key;
-    let noteId = event.target['attributes'].noteId || event.target['attributes'].newNoteId;
-    let newNote = event.target['attributes'].newNote;
-    if (key === 'Enter' && event.ctrlKey && noteId !== undefined) {
-      let noteIdValue = noteId.value;
+    let targetElement = event.target;
+    let parent = targetElement['closest']('[noteId]');
+    
+    if (key === 'i' && event.ctrlKey) {
+      this._ns.addNote();
+    }
 
-      if (newNote !== undefined) {
-        this.saveNote(noteIdValue);
-      } else {
-        this.updateNote(noteIdValue);
+    if (parent) {
+      let noteId = parent['attributes'].noteId || parent['attributes'].newNoteId;
+      let newNote = parent['attributes'].newNote.value;
+      if (key === 'Enter' && event.ctrlKey && noteId !== undefined) {
+        let noteIdValue = noteId.value;
+
+        if (newNote === 'true') {
+          this._ns.saveNote(noteIdValue);
+        } else {
+          this._ns.updateNote(noteIdValue);
+        }
       }
-    } else if (key === 'i' && event.ctrlKey) {
-      this.addNote();
     }
   }
 
   ngOnInit() {
-    this.newNoteIndex = 0;
-    this.noteProperties = new Array();
-    this.noteProperties['notes'] = new Array();
-    this.noteProperties['newNotes'] = new Array();
-
     this.loadColumns();
 
     this.loadNotes();
@@ -101,97 +98,26 @@ export class VDBComponent {
   }
 
   loadColumns() {
-    this._spaceService.getColumns().subscribe(columns => {
-      this.columns = columns;
+    this._ss.getColumns().subscribe(columns => {
+      this._ss.columns = columns;
     });
   }
 
   loadNotes() {
-    this._spaceService.getNotes().subscribe(notes => {
-      this.initNoteForms(notes);
+    this._ss.getNotes().subscribe(notes => {
+      this._ns.notes = notes;
+      this._ns.initNoteForms(notes);
     });
-  }
-
-  initNoteForms(notes) {
-    this.notes = notes;
-    this.notesFormGroup = new FormGroup({});
-    _.each(notes, (note) => {
-      this.noteProperties['notes'][note.ID] = new Array();
-      this.noteProperties['notes'][note.ID]['saving'] = false;
-      this.notesFormGroup.controls[note.ID] = new FormGroup({
-        ID: new FormControl(note.ID),
-        DATE: new FormControl(this.getDate(note.DATE)),
-        TITLE: new FormControl(note.TITLE),
-        NOTE: new FormControl(note.NOTE)
-      });
-    });
-  }
-
-  addNote() {
-    this.noteProperties['newNotes'][this.newNoteIndex] = new Array();
-    this.noteProperties['newNotes'][this.newNoteIndex]['saving'] = false;
-    this.newNotesFormGroup.controls[this.newNoteIndex] = new FormGroup({
-      DATE: new FormControl(new Date()),
-      TITLE: new FormControl(),
-      NOTE: new FormControl()
-    });
-
-    this.newNoteIndex += 1;
-  }
-
-  saveNote(index) {
-    this.noteProperties['newNotes'][index]['saving'] = true;
-    this._spaceService.saveNote(this.newNotesFormGroup.controls[index].value)
-      .subscribe(res => {
-        if (res.status === 200) {
-          this.noteProperties['newNotes'][index]['saving'] = false;
-          this.deleteNewNote(index);
-          this.loadNotes();
-        } else {
-          this.noteProperties['newNotes'][index]['saving'] = false;
-        }
-      });
-  }
-
-  updateNote(index) {
-    this.noteProperties['notes'][index]['saving'] = true;
-    this._spaceService.updateNote(this.notesFormGroup.controls[index].value)
-      .subscribe(res => {
-        if (res.status === 200) {
-          this.noteProperties['notes'][index]['saving'] = false;
-        } else {
-          this.noteProperties['notes'][index]['saving'] = false;
-        }
-      });
-  }
-
-  deleteNewNote(index) {
-    this.newNotesFormGroup.removeControl(index);
-    this.newNoteIndex -= 1;
-  }
-
-  deleteSavedNote(index, noteId) {
-    this.notes = this.notes.splice(index, 1);
-    this.notesFormGroup.removeControl(noteId);
-    this._spaceService.archiveNote(noteId);
-  }
-
-  getDate(dateString) {
-    return new Date(dateString);
-  }
-
-  getNotesArray(controlGroup) {
-    return Object.keys(controlGroup.controls);
   }
 
   applyFilters() {
     let filterControls = this.filterOptions.controls;
     let columnSelection = filterControls.column.value;
     let filterOptionsValue = this.filterOptions.value;
-    let columnSelectionColumn = _.find(this.columns, { 'name': columnSelection });
+    let columnSelectionColumn = _.find(this._ss.columns, { 'name': columnSelection });
 
-    this._spaceService.filterNotes(this.filterOptions.value).subscribe(filteredNotes => {
-      this.initNoteForms(filteredNotes);
+    this._ss.filterNotes(this.filterOptions.value).subscribe(filteredNotes => {
+      this._ns.initNoteForms(filteredNotes);
     });
   }
 
@@ -210,7 +136,7 @@ export class VDBComponent {
   columnChange() {
     let filterControls = this.filterOptions.controls;
     let columnSelection = filterControls.column.value;
-    let columnSelectionColumn = _.find(this.columns, { 'name': columnSelection });
+    let columnSelectionColumn = _.find(this._ss.columns, { 'name': columnSelection });
 
     if (columnSelectionColumn.name.indexOf('DATE') >= 0) {
       this.displayOperators = this.operators;

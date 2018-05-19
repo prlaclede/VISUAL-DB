@@ -1,3 +1,7 @@
+note {
+    width: 97%;
+}
+
 .toolbar-spacer {
     flex: 1 1 auto;
 }
@@ -44,11 +48,6 @@
     margin: 20px;
 }
 
-.note-save-progress {
-    float: right;
-    margin: 5px 10px 0px 0px;
-}
-
 #notes-filters {
     text-align: center;
 }
@@ -57,8 +56,4 @@
     height: 100%;
     width: 100%;
     margin: 5px 0px 5px 0px;
-}
-
-.full-width {
-    width: 100%;
 }
