@@ -20,6 +20,7 @@ export class NoteComponent {
     @Input() noteFG: FormGroup;
     @Input() noteProperties: Array<any>;
     @Input() newNote: boolean;
+    @Input() isChild: boolean;
 
     noteAttributes: any;
     

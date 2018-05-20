@@ -1,4 +1,4 @@
-<mat-card class="note-card" [formGroup]="noteFG" attr.newNote="{{newNote}}" attr.noteId="{{noteAttributes.ID.value}}">
+<mat-card class="note-card" [formGroup]="noteFG" attr.isChild="{{isChild}}" attr.newNote="{{newNote}}" attr.noteId="{{noteAttributes.ID.value}}">
     <mat-card-header>
         <mat-card-title>
             {{noteAttributes.ID.value}}
@@ -19,6 +19,22 @@
         <mat-form-field class="full-width">
             <textarea matInput formControlName="NOTE" placeholder="Note"></textarea>
         </mat-form-field>
+        <mat-accordion *ngIf="noteAttributes.children">
+            <mat-expansion-panel class="note-children">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Children
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        Details
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                <p>{{content}}</p>
+                <note *ngFor="let childNoteId of _ns.getNotesArray(noteAttributes.children); let i=index" 
+                    [noteFG]="noteAttributes.children.controls[childNoteId]"
+                    [noteProperties]="_ns.noteProperties['notes'][childNoteId]" [isChild]="true" [newNote]="false"></note>
+            </mat-expansion-panel>
+        </mat-accordion>
     </mat-card-content>
     <mat-card-actions>
         <button *ngIf="newNote" mat-button (click)="_ns.saveNote(noteAttributes.ID.value)">Save</button>

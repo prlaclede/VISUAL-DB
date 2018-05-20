@@ -81,9 +81,9 @@
           </mat-list-item>
         </mat-list>
         <mat-list role="list" id="notes-list">
-          <mat-list-item *ngFor="let note of _ns.notes; let i=index" role="listitem" class="note-card-item">
+          <mat-list-item *ngFor="let noteId of _ns.getNotesArray(_ns.notesFormGroup); let i=index" role="listitem" class="note-card-item">
             <!-- SAVED NOTES -->
-            <note [noteFG]="_ns.notesFormGroup.controls[note.ID]" [noteProperties]="_ns.noteProperties['notes'][note.ID]" [newNote]="false"></note>
+            <note [noteFG]="_ns.notesFormGroup.controls[noteId]" [noteProperties]="_ns.noteProperties['notes'][noteId]" [newNote]="false"></note>
           </mat-list-item>
         </mat-list>
       </div>

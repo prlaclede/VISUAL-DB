@@ -26,8 +26,8 @@ export class NoteService {
         this.noteProperties['newNotes'] = new Array();
 
         this.notes = notes;
-        console.log(notes);
         this.notesFormGroup = new FormGroup({});
+
         _.each(notes, (note) => {
             this.noteProperties['notes'][note.ID] = new Array();
             this.noteProperties['notes'][note.ID]['saving'] = false;
@@ -39,6 +39,24 @@ export class NoteService {
                 PARENT: new FormControl(note.PARENT)
             });
         });
+
+        let notesTree = this.makeNotesTree(notes);
+    }
+
+    makeNotesTree(notes) {
+        var groupedNotes = _.groupBy(notes, 'PARENT');
+        _.each(_.omit(groupedNotes, ['', 'null']), (children, parentId) => {
+            let parentNoteFormGroup = this.notesFormGroup.controls[parentId]['controls'];
+            parentNoteFormGroup['children'] = new FormGroup({});
+            
+            _.each(children, (child) => {
+                parentNoteFormGroup['children'].controls[child.ID] = this.notesFormGroup.controls[child.ID];
+                this.notesFormGroup.removeControl(child.ID);
+            });
+        });
+
+        console.log(this.notesFormGroup);
+        return groupedNotes;
     }
 
     getNotesArray(controlGroup) {
@@ -92,7 +110,7 @@ export class NoteService {
                     // if () {
                     //     this.notes.push(newNoteObj);
                     // } else {
-                        this.notes.unshift(newNoteObj);
+                    this.notes.unshift(newNoteObj);
                     // }
                     console.log(this.noteProperties);
                 } else {
@@ -102,6 +120,7 @@ export class NoteService {
     }
 
     updateNote(index) {
+        console.log(index);
         this.noteProperties['notes'][index]['saving'] = true;
         this._ss.updateNote(this.notesFormGroup.controls[index].value)
             .subscribe(res => {
@@ -119,7 +138,7 @@ export class NoteService {
     }
 
     deleteSavedNote(noteId) {
-        let noteIndex = _.findKey(this.notes, {ID: noteId});
+        let noteIndex = _.findKey(this.notes, { ID: noteId });
         this.notes.splice(noteIndex, 1);
         this.notesFormGroup.removeControl(noteId);
         this._ss.archiveNote(noteId);

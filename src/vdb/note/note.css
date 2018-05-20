@@ -17,5 +17,13 @@
 }
 
 .note-card[newNote='false'] {
-    background: #eff2ff;
+    background: #eafaff;
+}
+
+.note-card[isChild='true'] {
+    width: inherit;
+}
+
+.note-children {
+    background: #bae2ff;
 }
