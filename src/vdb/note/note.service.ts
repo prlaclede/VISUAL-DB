@@ -77,16 +77,16 @@ export class NoteService {
         this.newNoteIndex += 1;
     }
 
-    saveNote(index) {
-        let newNoteValue = this.newNotesFormGroup.controls[index].value;
-        console.log(newNoteValue);
-        this.noteProperties['newNotes'][index]['saving'] = true;
+    saveNote(noteFG) {
+        let newNoteIndex = noteFG.controls.ID.value;
+        let newNoteValue = noteFG.value;
+        this.noteProperties['newNotes'][newNoteIndex]['saving'] = true;
         this._ss.saveNote(newNoteValue)
             .subscribe(res => {
                 if (res.status === 200) {
                     let noteId = JSON.parse(res['_body'])[0];
-                    this.noteProperties['newNotes'][index]['saving'] = false;
-                    this.deleteNewNote(index);
+                    this.noteProperties['newNotes'][newNoteIndex]['saving'] = false;
+                    this.deleteNewNote(newNoteIndex);
                     /* add to the notes FormGroup */
                     this.notesFormGroup.controls[noteId] = new FormGroup({
                         ID: new FormControl(noteId),
@@ -114,20 +114,20 @@ export class NoteService {
                     // }
                     console.log(this.noteProperties);
                 } else {
-                    this.noteProperties['newNotes'][index]['saving'] = false;
+                    this.noteProperties['newNotes'][newNoteIndex]['saving'] = false;
                 }
             });
     }
 
-    updateNote(index) {
-        console.log(index);
-        this.noteProperties['notes'][index]['saving'] = true;
-        this._ss.updateNote(this.notesFormGroup.controls[index].value)
+    updateNote(noteFG) {
+        let noteId = noteFG.controls.ID.value;
+        this.noteProperties['notes'][noteId]['saving'] = true;
+        this._ss.updateNote(noteFG.value)
             .subscribe(res => {
                 if (res.status === 200) {
-                    this.noteProperties['notes'][index]['saving'] = false;
+                    this.noteProperties['notes'][noteId]['saving'] = false;
                 } else {
-                    this.noteProperties['notes'][index]['saving'] = false;
+                    this.noteProperties['notes'][noteId]['saving'] = false;
                 }
             });
     }

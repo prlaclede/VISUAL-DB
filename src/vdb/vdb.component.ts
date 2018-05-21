@@ -64,7 +64,7 @@ export class VDBComponent {
     let key = event.key;
     let targetElement = event.target;
     let parent = targetElement['closest']('[noteId]');
-    
+
     if (key === 'i' && event.ctrlKey) {
       this._ns.addNote();
     }
@@ -73,13 +73,7 @@ export class VDBComponent {
       let noteId = parent['attributes'].noteId || parent['attributes'].newNoteId;
       let newNote = parent['attributes'].newNote.value;
       if (key === 'Enter' && event.ctrlKey && noteId !== undefined) {
-        let noteIdValue = noteId.value;
-
-        if (newNote === 'true') {
-          this._ns.saveNote(noteIdValue);
-        } else {
-          this._ns.updateNote(noteIdValue);
-        }
+        parent.querySelector('.saveButton[noteId="' + noteId.value + '"]').click();
       }
     }
   }

@@ -37,10 +37,10 @@
         </mat-accordion>
     </mat-card-content>
     <mat-card-actions>
-        <button *ngIf="newNote" mat-button (click)="_ns.saveNote(noteAttributes.ID.value)">Save</button>
-        <button *ngIf="!newNote" mat-button (click)="_ns.updateNote(noteAttributes.ID.value)">Update</button>
-        <button *ngIf="newNote" mat-button (click)="_ns.deleteNewNote(noteAttributes.ID.value)">Delete</button>
-        <button *ngIf="!newNote" mat-button (click)="_ns.deleteSavedNote(noteAttributes.ID.value)">Delete</button>
+        <button *ngIf="newNote" attr.noteId="{{noteAttributes.ID.value}}" class="saveButton" mat-button (click)="_ns.saveNote(noteAttributes.ID.value)">Save</button>
+        <button *ngIf="!newNote" attr.noteId="{{noteAttributes.ID.value}}" class="saveButton" mat-button (click)="_ns.updateNote(noteFG)">Update</button>
+        <button *ngIf="newNote" attr.noteId="{{noteAttributes.ID.value}}" class="deleteButton" mat-button (click)="_ns.deleteNewNote(noteAttributes.ID.value)">Delete</button>
+        <button *ngIf="!newNote" attr.noteId="{{noteAttributes.ID.value}}" class="deleteButton" mat-button (click)="_ns.deleteSavedNote(noteAttributes.ID.value)">Delete</button>
         <mat-spinner *ngIf="noteProperties['saving']" diameter="25" class="note-save-progress"></mat-spinner>
     </mat-card-actions>
 </mat-card>
