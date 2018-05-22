@@ -20,6 +20,7 @@ export class NoteComponent {
     @Input() noteFG: FormGroup;
     @Input() noteProperties: Array<any>;
     @Input() newNote: boolean;
+    @Input() parent: number;
     @Input() isChild: boolean;
 
     noteAttributes: any;
@@ -29,6 +30,7 @@ export class NoteComponent {
 
     ngOnInit() {
         this.noteAttributes = this.noteFG.controls;
+        this.noteFG.controls.PARENT.patchValue(this.parent);
     }
 
     ngOnDestroy(): void {

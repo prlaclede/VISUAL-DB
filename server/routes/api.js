@@ -44,7 +44,7 @@ router.get('/columns', (req, res) => {
 
 // Get notes
 router.get('/notes', (req, res) => {
-    let notesResults = knex.select("*").from("SPACE").orderBy('ID', 'DESC');;
+    let notesResults = knex.select("*").from("SPACE").where('STATUS', '=', 'open').orderBy('ID', 'DESC');;
     notesResults.then(function (notes) {
         res.send(notes);
     });
@@ -119,7 +119,10 @@ router.post('/note/update', function (req, res) {
 
 router.post('/note/archive', function (req, res) {
     let note = req.body;
-    let noteArchive = knex("SPACE").where("ID", "=", note.ID).del();
+    let noteArchive = knex("SPACE").where("ID", "=", note.ID)
+        .update({
+            STATUS: 'archived'
+        });
 
     noteArchive.then(function () {
         res.sendStatus(200);

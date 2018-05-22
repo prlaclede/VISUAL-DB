@@ -16,6 +16,10 @@ note {
     right: 0;
 }
 
+.buttonIcon {
+    margin: 0px 5px 5px -5px;
+}
+
 .vdb-is-mobile {
     position: fixed;
     /* Make sure the toolbar will stay on top of the content as it scrolls past. */

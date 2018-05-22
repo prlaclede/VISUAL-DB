@@ -40,17 +40,17 @@ export class NoteService {
             });
         });
 
-        let notesTree = this.makeNotesTree(notes);
+        let notesTree = this.makeNotesTree();
     }
 
-    makeNotesTree(notes) {
-        var groupedNotes = _.groupBy(notes, 'PARENT');
+    makeNotesTree() {
+        var groupedNotes = _.groupBy(this.notes, 'PARENT');
         _.each(_.omit(groupedNotes, ['', 'null']), (children, parentId) => {
             let parentNoteFormGroup = this.notesFormGroup.controls[parentId]['controls'];
-            parentNoteFormGroup['children'] = new FormGroup({});
-            
+            parentNoteFormGroup.children = new FormGroup({});
+
             _.each(children, (child) => {
-                parentNoteFormGroup['children'].controls[child.ID] = this.notesFormGroup.controls[child.ID];
+                parentNoteFormGroup.children.controls[child.ID] = this.notesFormGroup.controls[child.ID];
                 this.notesFormGroup.removeControl(child.ID);
             });
         });
@@ -77,24 +77,37 @@ export class NoteService {
         this.newNoteIndex += 1;
     }
 
+    addChild(noteFG) {
+        this.noteProperties['newNotes'][this.newNoteIndex] = new Array();
+        this.noteProperties['newNotes'][this.newNoteIndex]['saving'] = false;
+        noteFG.controls.newChildren = new FormGroup({});
+        noteFG.controls.newChildren.controls[this.newNoteIndex] = new FormGroup({
+            ID: new FormControl(this.newNoteIndex),
+            DATE: new FormControl(new Date()),
+            TITLE: new FormControl(),
+            NOTE: new FormControl(),
+            PARENT: new FormControl()
+        });
+        this.newNoteIndex += 1;
+    }
+
     saveNote(noteFG) {
-        let newNoteIndex = noteFG.controls.ID.value;
         let newNoteValue = noteFG.value;
-        this.noteProperties['newNotes'][newNoteIndex]['saving'] = true;
+        this.noteProperties['newNotes'][newNoteValue['ID']]['saving'] = true;
         this._ss.saveNote(newNoteValue)
             .subscribe(res => {
                 if (res.status === 200) {
                     let noteId = JSON.parse(res['_body'])[0];
-                    this.noteProperties['newNotes'][newNoteIndex]['saving'] = false;
-                    this.deleteNewNote(newNoteIndex);
+                    this.noteProperties['newNotes'][newNoteValue['ID']]['saving'] = false;
+                    this.deleteNewNote(noteFG);
                     /* add to the notes FormGroup */
-                    this.notesFormGroup.controls[noteId] = new FormGroup({
-                        ID: new FormControl(noteId),
-                        DATE: new FormControl(this._cs.getDate(newNoteValue.DATE)),
-                        TITLE: new FormControl(newNoteValue.TITLE),
-                        NOTE: new FormControl(newNoteValue.NOTE),
-                        PARENT: new FormControl(newNoteValue.PARENT)
-                    });
+                    // this.notesFormGroup.controls[noteId] = new FormGroup({
+                    //     ID: new FormControl(noteId),
+                    //     DATE: new FormControl(this._cs.getDate(newNoteValue.DATE)),
+                    //     TITLE: new FormControl(newNoteValue.TITLE),
+                    //     NOTE: new FormControl(newNoteValue.NOTE),
+                    //     PARENT: new FormControl(newNoteValue.PARENT)
+                    // });
                     /* add to the noteProperties array */
                     this.noteProperties['notes'][noteId] = new Array();
                     this.noteProperties['notes'][noteId]['saving'] = false;
@@ -107,14 +120,16 @@ export class NoteService {
                         PARENT: newNoteValue.PARENT
                     }
 
-                    // if () {
-                    //     this.notes.push(newNoteObj);
-                    // } else {
-                    this.notes.unshift(newNoteObj);
+                    // if (ASC) {
+                    this.notes.push(newNoteObj);
+                    // } else { DESC
+                    // this.notes.unshift(newNoteObj);
+
+                    this.makeNotesTree();
                     // }
                     console.log(this.noteProperties);
                 } else {
-                    this.noteProperties['newNotes'][newNoteIndex]['saving'] = false;
+                    this.noteProperties['newNotes'][newNoteValue['ID']]['saving'] = false;
                 }
             });
     }
@@ -132,12 +147,14 @@ export class NoteService {
             });
     }
 
-    deleteNewNote(noteId) {
+    deleteNewNote(noteFG) {
+        let noteId = noteFG.controls.ID.value;
         this.newNotesFormGroup.removeControl(noteId);
         this.newNoteIndex -= 1;
     }
 
-    deleteSavedNote(noteId) {
+    deleteSavedNote(noteFG) {
+        let noteId = noteFG.controls.ID.value;
         let noteIndex = _.findKey(this.notes, { ID: noteId });
         this.notes.splice(noteIndex, 1);
         this.notesFormGroup.removeControl(noteId);

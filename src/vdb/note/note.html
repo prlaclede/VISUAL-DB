@@ -1,24 +1,41 @@
 <mat-card class="note-card" [formGroup]="noteFG" attr.isChild="{{isChild}}" attr.newNote="{{newNote}}" attr.noteId="{{noteAttributes.ID.value}}">
     <mat-card-header>
-        <mat-card-title>
-            {{noteAttributes.ID.value}}
-            <mat-form-field>
-                <input matInput [matDatepicker]="index" formControlName="DATE" placeholder="Date">
-                <mat-datepicker-toggle matSuffix [for]="index"></mat-datepicker-toggle>
-                <mat-datepicker #index></mat-datepicker>
-            </mat-form-field>
-            <mat-form-field>
-                <input matInput formControlName="TITLE" placeholder="Title">
-            </mat-form-field>
-            <mat-form-field>
-                <input matInput formControlName="PARENT" placeholder="Parent">
-            </mat-form-field>
-        </mat-card-title>
+        <mat-card-title-group>
+            <mat-card-title>
+                {{noteAttributes.ID.value}}
+                <mat-form-field>
+                    <input matInput [matDatepicker]="index" formControlName="DATE" placeholder="Date">
+                    <mat-datepicker-toggle matSuffix [for]="index"></mat-datepicker-toggle>
+                    <mat-datepicker #index></mat-datepicker>
+                </mat-form-field>
+                <mat-form-field>
+                    <input matInput formControlName="TITLE" placeholder="Title">
+                </mat-form-field>
+                <mat-form-field>
+                    <input matInput formControlName="PARENT" placeholder="Parent">
+                </mat-form-field>
+            </mat-card-title>
+        </mat-card-title-group>
     </mat-card-header>
     <mat-card-content>
         <mat-form-field class="full-width">
             <textarea matInput formControlName="NOTE" placeholder="Note"></textarea>
         </mat-form-field>
+        <mat-accordion *ngIf="noteAttributes.newChildren">
+            <mat-expansion-panel class="new-note-children">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Children
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        Details
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+                <p>{{content}}</p>
+                <note *ngFor="let childNoteId of _ns.getNotesArray(noteAttributes.newChildren); let i=index" [noteFG]="noteAttributes.newChildren.controls[childNoteId]"
+                    [noteProperties]="_ns.noteProperties['newNotes'][childNoteId]" [isChild]="true" [newNote]="true" [parent]="noteAttributes.ID.value"></note>
+            </mat-expansion-panel>
+        </mat-accordion>
         <mat-accordion *ngIf="noteAttributes.children">
             <mat-expansion-panel class="note-children">
                 <mat-expansion-panel-header>
@@ -30,17 +47,27 @@
                     </mat-panel-description>
                 </mat-expansion-panel-header>
                 <p>{{content}}</p>
-                <note *ngFor="let childNoteId of _ns.getNotesArray(noteAttributes.children); let i=index" 
-                    [noteFG]="noteAttributes.children.controls[childNoteId]"
+                <note *ngFor="let childNoteId of _ns.getNotesArray(noteAttributes.children); let i=index" [noteFG]="noteAttributes.children.controls[childNoteId]"
                     [noteProperties]="_ns.noteProperties['notes'][childNoteId]" [isChild]="true" [newNote]="false"></note>
             </mat-expansion-panel>
         </mat-accordion>
     </mat-card-content>
     <mat-card-actions>
-        <button *ngIf="newNote" attr.noteId="{{noteAttributes.ID.value}}" class="saveButton" mat-button (click)="_ns.saveNote(noteAttributes.ID.value)">Save</button>
-        <button *ngIf="!newNote" attr.noteId="{{noteAttributes.ID.value}}" class="saveButton" mat-button (click)="_ns.updateNote(noteFG)">Update</button>
-        <button *ngIf="newNote" attr.noteId="{{noteAttributes.ID.value}}" class="deleteButton" mat-button (click)="_ns.deleteNewNote(noteAttributes.ID.value)">Delete</button>
-        <button *ngIf="!newNote" attr.noteId="{{noteAttributes.ID.value}}" class="deleteButton" mat-button (click)="_ns.deleteSavedNote(noteAttributes.ID.value)">Delete</button>
+        <button *ngIf="newNote" attr.noteId="{{noteAttributes.ID.value}}" class="saveButton" mat-button (click)="_ns.saveNote(noteFG)">
+            <mat-icon class="buttonIcon" mat-icon>save</mat-icon> Save
+        </button>
+        <button *ngIf="!newNote" attr.noteId="{{noteAttributes.ID.value}}" class="saveButton" mat-button (click)="_ns.updateNote(noteFG)">
+            <mat-icon class="buttonIcon" mat-icon>save</mat-icon> Update
+        </button>
+        <button class="addChild" attr.noteId="{{noteAttributes.ID.value}}" class="addChildButton" mat-button (click)="_ns.addChild(noteFG)">
+            <mat-icon class="buttonIcon" mat-icon>subdirectory_arrow_left</mat-icon> Add Child
+        </button>
+        <button *ngIf="newNote" attr.noteId="{{noteAttributes.ID.value}}" class="deleteButton" mat-button (click)="_ns.deleteNewNote(noteFG)">
+            <mat-icon class="buttonIcon" mat-icon>delete</mat-icon> Delete
+        </button>
+        <button *ngIf="!newNote" attr.noteId="{{noteAttributes.ID.value}}" class="deleteButton" mat-button (click)="_ns.deleteSavedNote(noteFG)">
+            <mat-icon class="buttonIcon" mat-icon>delete</mat-icon> Delete
+        </button>
         <mat-spinner *ngIf="noteProperties['saving']" diameter="25" class="note-save-progress"></mat-spinner>
     </mat-card-actions>
 </mat-card>

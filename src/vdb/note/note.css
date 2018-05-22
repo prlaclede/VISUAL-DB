@@ -24,6 +24,14 @@
     width: inherit;
 }
 
+.new-note-children {
+    background: #f9efff;
+}
+
 .note-children {
     background: #bae2ff;
+}
+
+.buttonIcon {
+    margin: 0px 5px 5px -5px;
 }

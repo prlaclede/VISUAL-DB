@@ -74,6 +74,8 @@ export class VDBComponent {
       let newNote = parent['attributes'].newNote.value;
       if (key === 'Enter' && event.ctrlKey && noteId !== undefined) {
         parent.querySelector('.saveButton[noteId="' + noteId.value + '"]').click();
+      } else if (key === 'Tab' && event.ctrlKey && noteId !== undefined) {
+        
       }
     }
   }
