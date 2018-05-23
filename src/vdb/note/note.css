@@ -1,10 +1,17 @@
-.note-card, .new-note-card {
+.note-card {
     width: 100%;
 }
 
+.note-contents {
+    width: 99%;
+    padding: 0px 0px 0px 10px;
+}
+
+.note-card > .mat-card-header,
 .note-card > .mat-card-content,
-.new-note-card > .mat-card-content {
-    margin: 0px;
+.note-card > .mat-card-actions {
+    margin: -10px;
+    padding: 0px;
 }
 
 .note-save-progress {
