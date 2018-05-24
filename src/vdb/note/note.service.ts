@@ -15,20 +15,17 @@ export class NoteService {
     newNoteIndex: number; //an index of new notes added to the form
     notesFormGroup = new FormGroup({}); //a formGroup for all the notes on the page
     newNotesFormGroup = new FormGroup({}); //a formGroup for all the new notes on the page
-
-    notes: Array<any>; //a list of notes loaded from the DB, used some orderBy can be maintained
     noteProperties: Array<any>; //a list of objects containing various note status (saving, etc...)
 
-    initNoteForms(notes) {
+    initNoteForms() {
         this.newNoteIndex = 1;
         this.noteProperties = new Array();
         this.noteProperties['notes'] = new Array();
         this.noteProperties['newNotes'] = new Array();
 
-        this.notes = notes;
         this.notesFormGroup = new FormGroup({});
 
-        _.each(notes, (note) => {
+        _.each(this._ss.data['notes'], (note) => {
             this.noteProperties['notes'][note.ID] = new Array();
             this.noteProperties['notes'][note.ID]['saving'] = false;
             this.notesFormGroup.controls[note.ID] = new FormGroup({
@@ -107,7 +104,7 @@ export class NoteService {
                     }
 
                     // if (ASC) {
-                    this.notes.push(newNoteObj);
+                    this._ss.data['notes'].push(newNoteObj);
                     // } else { DESC
                     // this.notes.unshift(newNoteObj);
                     // }
@@ -139,8 +136,8 @@ export class NoteService {
 
     deleteSavedNote(noteFG) {
         let noteId = noteFG.controls.ID.value;
-        let noteIndex = _.findKey(this.notes, { ID: noteId });
-        this.notes.splice(noteIndex, 1);
+        let noteIndex = _.findKey(this._ss.data['notes'], { ID: noteId });
+        this._ss.data['notes'].splice(noteIndex, 1);
         this.notesFormGroup.removeControl(noteId);
         this._ss.archiveNote(noteId);
     }

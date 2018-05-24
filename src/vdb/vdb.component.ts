@@ -45,15 +45,19 @@ export class VDBComponent {
       if (key === 'Enter' && event.ctrlKey && noteId !== undefined) {
         parent.querySelector('.saveButton[noteId="' + noteId.value + '"]').click();
       } else if (key === 'Tab' && event.ctrlKey && noteId !== undefined) {
-        
+
       }
     }
   }
 
   ngOnInit() {
-    this.loadColumns();
+    this._ss.getColumns().subscribe();
 
-    this.loadNotes();
+    this._ss.getNotes().subscribe(() => {
+      this._ns.initNoteForms();
+    });
+
+    this._ss.getFilters().subscribe();
   }
 
   ngAfterContentChecked() {
@@ -61,20 +65,6 @@ export class VDBComponent {
       var noteTextArea = document.querySelector('.newNote');
       document.getElementById(noteTextArea.id).focus();
     }
-  }
-
-  loadColumns() {
-    this._ss.getColumns().subscribe(columns => {
-      this._ss.columns = columns;
-      console.log(this._ss.columns);
-    });
-  }
-
-  loadNotes() {
-    this._ss.getNotes().subscribe(notes => {
-      this._ns.notes = notes;
-      this._ns.initNoteForms(notes);
-    });
   }
 
   ngOnDestroy(): void {

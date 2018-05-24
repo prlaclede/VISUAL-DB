@@ -30,6 +30,7 @@ import { CommonService } from './common/common.service';
     MaterialModule,
     LoggerModule.forRoot({serverLoggingUrl: '../logs', level: NgxLoggerLevel.DEBUG, serverLogLevel: NgxLoggerLevel.ERROR})
   ],
+  entryComponents: [FilterSaveComponent],
   providers: [
     SpaceService,
     NoteService,

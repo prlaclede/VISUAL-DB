@@ -23,6 +23,7 @@ import {
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
@@ -59,6 +60,7 @@ const materialModules = [
     materialModules,
     BrowserAnimationsModule,
     FormsModule,
+    MatTabsModule,
     MatDialogModule,
     ReactiveFormsModule,
     MatProgressSpinnerModule
@@ -67,6 +69,8 @@ const materialModules = [
     materialModules,
     BrowserAnimationsModule,
     FormsModule,
+    MatTabsModule,
+    MatDialogModule,
     ReactiveFormsModule,
     MatProgressSpinnerModule
   ],

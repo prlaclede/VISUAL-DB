@@ -44,9 +44,17 @@ router.get('/columns', (req, res) => {
 
 // Get notes
 router.get('/notes', (req, res) => {
-    let notesResults = knex.select("*").from("SPACE").where('STATUS', '=', 'open').orderBy('ID', 'DESC');;
+    let notesResults = knex.select("*").from("SPACE").where('STATUS', '=', 'open').orderBy('ID', 'DESC');
     notesResults.then(function (notes) {
         res.send(notes);
+    });
+});
+
+// Get saved filters
+router.get('/filters', (req, res) => {
+    let filterResults = knex.select("*").from("FILTERS");
+    filterResults.then(function (filters) {
+        res.send(filters);
     });
 });
 
@@ -125,6 +133,40 @@ router.post('/note/archive', function (req, res) {
         });
 
     noteArchive.then(function () {
+        res.sendStatus(200);
+    }).catch(function (err) {
+        console.log(err);
+        res.sendStatus(500)
+    });
+});
+
+router.post('/filter/save', function (req, res) {
+    let filter = req.body;
+    console.log(filter);
+    let filterSave = knex("FILTERS")
+        .insert({
+            NAME: filter.name,
+            COLUMN: filter.column,
+            OPERATOR: filter.operator,
+            VALUE: filter.value,
+            DEFAULT: filter.defaultFilter
+        });
+    filterSave.then(function (filterId) {
+        res.send(filterId);
+    }).catch(function (err) {
+        console.log(err);
+        res.sendStatus(500)
+    });
+});
+
+router.post('/filter/delete', function (req, res) {
+    let note = req.body;
+    let filterArchive = knex("FILTER").where("ID", "=", note.ID)
+        .update({
+            STATUS: 'archived'
+        });
+
+    filterArchive.then(function () {
         res.sendStatus(200);
     }).catch(function (err) {
         console.log(err);

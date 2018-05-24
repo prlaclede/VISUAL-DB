@@ -37,12 +37,15 @@ export class FilterComponent {
 
     /* the filter options formGroup to capture user input */
     filterOptions = new FormGroup({
-        column: new FormControl(),
-        operator: new FormControl(),
-        value: new FormControl(),
-        type: new FormControl(),
-        orderBy: new FormControl(),
-        order: new FormControl()
+        selectedFilter: new FormControl(), //the selected saved filter on the form
+        defaultFilter: new FormControl(), //if the new filter being saved should be the default
+        name: new FormControl(), //the new filters name
+        column: new FormControl(), //the column to filter by
+        operator: new FormControl(), //the operator to filter by
+        value: new FormControl(), //the value to filter by
+        type: new FormControl(), //the type of the column being filtered
+        orderBy: new FormControl(), //what column to order by
+        order: new FormControl() //what order to show notes in
     });
 
     constructor(public dialog: MatDialog, private _cs: CommonService,
@@ -53,9 +56,30 @@ export class FilterComponent {
             width: '250px'
         });
 
-        dialogRef.afterClosed().subscribe(result => {
-            console.log('The dialog was closed');
+        dialogRef.afterClosed().subscribe(() => {
         });
+
+        dialogRef.componentInstance.filterNameSubmit.subscribe((filterData: any) => {
+            this.filterOptions.controls.name.patchValue(filterData.filterName);
+            this.filterOptions.controls.defaultFilter.patchValue(filterData.defaultFilter);
+            this.saveFilter();
+        });
+    }
+
+    savedFilters() {
+        return (this._ss.data['filters'] && Object.keys(this._ss.data['filters'].length > 0));
+    }
+
+    saveFilter() {
+        console.log(this.filterOptions);
+        this._ss.saveFilter(this.filterOptions.value)
+            .subscribe(res => {
+                if (res.status === 200) {
+
+                } else {
+
+                }
+            });
     }
 
     filterValid() {
@@ -67,19 +91,34 @@ export class FilterComponent {
         }
     }
 
+    filterToggle() {
+        let filterControls = this.filterOptions.controls;
+        let selectedFilter = _.find(this._ss.data['filters'], { 'NAME': filterControls.selectedFilter.value });
+        console.log(selectedFilter);
+        filterControls.column.patchValue(selectedFilter.COLUMN);
+        filterControls.operator.patchValue(selectedFilter.OPERATOR);
+        filterControls.value.patchValue(selectedFilter.VALUE);
+        let columnSelectionColumn = _.find(this._ss.data['column'], { 'name': selectedFilter.COLUMN });
+
+        this._ss.filterNotes(this.filterOptions.value).subscribe(() => {
+            this._ns.initNoteForms();
+        });
+    }
+
     applyFilters() {
         let filterControls = this.filterOptions.controls;
         let columnSelection = filterControls.column.value;
         let filterOptionsValue = this.filterOptions.value;
-        let columnSelectionColumn = _.find(this._ss.columns, { 'name': columnSelection });
+        let columnSelectionColumn = _.find(this._ss.data['column'], { 'name': columnSelection });
 
-        this._ss.filterNotes(this.filterOptions.value).subscribe(filteredNotes => {
-            this._ns.initNoteForms(filteredNotes);
+        this._ss.filterNotes(this.filterOptions.value).subscribe(() => {
+            this._ns.initNoteForms();
         });
     }
 
     clearFilters() {
         let filterControls = this.filterOptions.controls;
+        filterControls.selectedFilter.patchValue('');
         filterControls.column.patchValue('');
         filterControls.operator.patchValue('');
         filterControls.value.patchValue('');
@@ -87,20 +126,15 @@ export class FilterComponent {
         filterControls.orderBy.patchValue('');
         filterControls.order.patchValue('');
 
-        this.loadNotes();
-    }
-
-    loadNotes() {
-        this._ss.getNotes().subscribe(notes => {
-            this._ns.notes = notes;
-            this._ns.initNoteForms(notes);
+        this._ss.getNotes().subscribe(() => {
+            this._ns.initNoteForms();
         });
     }
 
     columnChange() {
         let filterControls = this.filterOptions.controls;
         let columnSelection = filterControls.column.value;
-        let columnSelectionColumn = _.find(this._ss.columns, { 'name': columnSelection });
+        let columnSelectionColumn = _.find(this._ss.data['columns'], { 'name': columnSelection });
 
         if (columnSelectionColumn.name.indexOf('DATE') >= 0) {
             this.displayOperators = this.operators;

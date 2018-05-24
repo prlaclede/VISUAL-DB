@@ -9,17 +9,28 @@ export class SpaceService {
 
   constructor(private _http: Http) { }
 
-  columns: Array<any>; //a list of column present in the current space
+  data = new Array<any>();
 
   getColumns() {
     return this._http.get('./api/columns').map(res => {
-      return res.json();
+      this.data['columns'] = new Array<any>();
+      console.log(res.json());
+      this.data['columns'] = res.json();
     });
   }
 
   getNotes() {
     return this._http.get('./api/notes').map(res => {
-      return res.json();
+      this.data['notes'] = new Array<any>();
+      this.data['notes'] = res.json();
+    });
+  }
+
+  getFilters() {
+    return this._http.get('./api/filters').map(res => {
+      this.data['filters'] = new Array<any>();
+      console.log(res.json());
+      this.data['filters'] = res.json();
     });
   }
 
@@ -28,7 +39,7 @@ export class SpaceService {
     let options = new RequestOptions({ headers: headers });
 
     return this._http.post('./api/filterNotes', filter, options).map(res => {
-      return res.json();
+      this.data['notes'] = res.json();
     });
   }
 
@@ -55,6 +66,24 @@ export class SpaceService {
     let options = new RequestOptions({ headers: headers });
 
     return this._http.post('./api/note/archive', noteId, options).map(res => {
+      return res;
+    });
+  }
+
+  saveFilter(filter) {
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+
+    return this._http.post('./api/filter/save', filter, options).map(res => {
+      return res;
+    });
+  }
+
+  deleteFilter(filterId) {
+    let headers = new Headers({ 'Content-Type': 'application/json' });
+    let options = new RequestOptions({ headers: headers });
+
+    return this._http.post('./api/filter/archive', filterId, options).map(res => {
       return res;
     });
   }
