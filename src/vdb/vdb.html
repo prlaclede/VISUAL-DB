@@ -28,52 +28,8 @@
       </mat-list>
     </mat-sidenav>
     <mat-sidenav-content>
+      <filter></filter>
       <div id="notes-container">
-        <mat-accordion id="notes-filters">
-          <mat-expansion-panel [formGroup]="filterOptions">
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                Filters
-              </mat-panel-title>
-              <mat-panel-description>
-                Filters Applied
-              </mat-panel-description>
-            </mat-expansion-panel-header>
-            <mat-form-field>
-              <mat-select placeholder="Order By" formControlName="orderBy">
-                <mat-option *ngFor="let column of columns" [value]="column.name">{{ column.name }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field>
-              <mat-select placeholder="Order" formControlName="order">
-                <mat-option *ngFor="let sort of sorts" [value]="sort.value">{{ sort.name }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field>
-              <mat-select placeholder="Column" formControlName="column" (change)="columnChange()">
-                <mat-option *ngFor="let column of columns" [value]="column.name">{{ column.name }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field>
-              <mat-select placeholder="Operator" formControlName="operator">
-                <mat-option *ngFor="let operator of displayOperators" [value]="operator.value">{{ operator.name }}</mat-option>
-              </mat-select>
-            </mat-form-field>
-            <mat-form-field *ngIf="filterValueType === 'DATE'">
-              <input matInput [matDatepicker]="filterpicker" placeholder="Choose a date" formControlName="value">
-              <mat-datepicker-toggle matSuffix [for]="filterpicker"></mat-datepicker-toggle>
-              <mat-datepicker #filterpicker></mat-datepicker>
-            </mat-form-field>
-            <mat-form-field *ngIf="filterValueType === 'INT'">
-              <input matInput placeholder="Value" type="number" formControlName="value">
-            </mat-form-field>
-            <mat-form-field *ngIf="filterValueType === 'TEXT'">
-              <input matInput placeholder="Value" formControlName="value">
-            </mat-form-field>
-            <button mat-raised-button color="accent" (click)="applyFilters()">Apply Filters</button>
-            <button mat-raised-button color="warn" (click)="clearFilters()">Clear Filters</button>
-          </mat-expansion-panel>
-        </mat-accordion>
         <mat-list *ngIf="_ns.newNoteIndex > 0" role="list" id="notes-list">
           <mat-list-item *ngFor="let newNoteId of _ns.getNotesArray(_ns.newNotesFormGroup); let i=index" role="listitem" class="note-card-item">
             <!-- NEW NOTES -->

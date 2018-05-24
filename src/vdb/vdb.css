@@ -52,10 +52,6 @@ note {
     margin: 20px;
 }
 
-#notes-filters {
-    text-align: center;
-}
-
 #notes-list > .note-card-item {
     height: 100%;
     width: 100%;

@@ -40,24 +40,24 @@ export class NoteService {
             });
         });
 
-        let notesTree = this.makeNotesTree();
+        // let notesTree = this.makeNotesTree();
     }
 
-    makeNotesTree() {
-        var groupedNotes = _.groupBy(this.notes, 'PARENT');
-        _.each(_.omit(groupedNotes, ['', 'null']), (children, parentId) => {
-            let parentNoteFormGroup = this.notesFormGroup.controls[parentId]['controls'];
-            parentNoteFormGroup.children = new FormGroup({});
+    // makeNotesTree() {
+    //     var groupedNotes = _.groupBy(this.notes, 'PARENT');
+    //     _.each(_.omit(groupedNotes, ['', 'null']), (children, parentId) => {
+    //         let parentNoteFormGroup = this.notesFormGroup.controls[parentId]['controls'];
+    //         parentNoteFormGroup.children = new FormGroup({});
 
-            _.each(children, (child) => {
-                parentNoteFormGroup.children.controls[child.ID] = this.notesFormGroup.controls[child.ID];
-                this.notesFormGroup.removeControl(child.ID);
-            });
-        });
+    //         _.each(children, (child) => {
+    //             parentNoteFormGroup.children.controls[child.ID] = this.notesFormGroup.controls[child.ID];
+    //             this.notesFormGroup.removeControl(child.ID);
+    //         });
+    //     });
 
-        console.log(this.notesFormGroup);
-        return groupedNotes;
-    }
+    //     console.log(this.notesFormGroup);
+    //     return groupedNotes;
+    // }
 
     getNotesArray(controlGroup) {
         return Object.keys(controlGroup.controls);
@@ -77,20 +77,6 @@ export class NoteService {
         this.newNoteIndex += 1;
     }
 
-    addChild(noteFG) {
-        this.noteProperties['newNotes'][this.newNoteIndex] = new Array();
-        this.noteProperties['newNotes'][this.newNoteIndex]['saving'] = false;
-        noteFG.controls.newChildren = new FormGroup({});
-        noteFG.controls.newChildren.controls[this.newNoteIndex] = new FormGroup({
-            ID: new FormControl(this.newNoteIndex),
-            DATE: new FormControl(new Date()),
-            TITLE: new FormControl(),
-            NOTE: new FormControl(),
-            PARENT: new FormControl()
-        });
-        this.newNoteIndex += 1;
-    }
-
     saveNote(noteFG) {
         let newNoteValue = noteFG.value;
         this.noteProperties['newNotes'][newNoteValue['ID']]['saving'] = true;
@@ -101,13 +87,13 @@ export class NoteService {
                     this.noteProperties['newNotes'][newNoteValue['ID']]['saving'] = false;
                     this.deleteNewNote(noteFG);
                     /* add to the notes FormGroup */
-                    // this.notesFormGroup.controls[noteId] = new FormGroup({
-                    //     ID: new FormControl(noteId),
-                    //     DATE: new FormControl(this._cs.getDate(newNoteValue.DATE)),
-                    //     TITLE: new FormControl(newNoteValue.TITLE),
-                    //     NOTE: new FormControl(newNoteValue.NOTE),
-                    //     PARENT: new FormControl(newNoteValue.PARENT)
-                    // });
+                    this.notesFormGroup.controls[noteId] = new FormGroup({
+                        ID: new FormControl(noteId),
+                        DATE: new FormControl(this._cs.getDate(newNoteValue.DATE)),
+                        TITLE: new FormControl(newNoteValue.TITLE),
+                        NOTE: new FormControl(newNoteValue.NOTE),
+                        PARENT: new FormControl(newNoteValue.PARENT)
+                    });
                     /* add to the noteProperties array */
                     this.noteProperties['notes'][noteId] = new Array();
                     this.noteProperties['notes'][noteId]['saving'] = false;
@@ -124,8 +110,6 @@ export class NoteService {
                     this.notes.push(newNoteObj);
                     // } else { DESC
                     // this.notes.unshift(newNoteObj);
-
-                    this.makeNotesTree();
                     // }
                     console.log(this.noteProperties);
                 } else {

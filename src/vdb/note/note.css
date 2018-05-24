@@ -7,6 +7,10 @@
     padding: 0px 0px 0px 10px;
 }
 
+.note-children, .new-note-children {
+    margin: 0px 0px 20px 0px;
+}
+
 .note-card > .mat-card-header,
 .note-card > .mat-card-content,
 .note-card > .mat-card-actions {
