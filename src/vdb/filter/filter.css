@@ -1,3 +1,10 @@
 #notes-filters {
     text-align: center;
 }
+
+.removeFilter {
+    color: red;
+    float: right;
+    margin: 0px;
+    padding: 0px;
+}

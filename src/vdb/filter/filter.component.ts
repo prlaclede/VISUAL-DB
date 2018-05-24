@@ -1,4 +1,5 @@
 import { Component, Inject } from '@angular/core';
+import { Directive, HostListener } from "@angular/core";
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { NGXLogger } from 'ngx-logger';
@@ -68,6 +69,10 @@ export class FilterComponent {
 
     savedFilters() {
         return (this._ss.data['filters'] && Object.keys(this._ss.data['filters'].length > 0));
+    }
+
+    showingSavedFilter() {
+        return (this.filterOptions.controls.selectedFilter.value);
     }
 
     saveFilter() {
@@ -152,4 +157,14 @@ export class FilterComponent {
         this.filterOptions.controls.type.patchValue(this.filterValueType);
     }
 
+}
+
+@Directive({
+    selector: "[click-stop-propagation]"
+})
+export class ClickStopPropagation {
+    @HostListener("click", ["$event"])
+    public onClick(event: any): void {
+        event.stopPropagation();
+    }
 }

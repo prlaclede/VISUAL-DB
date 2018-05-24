@@ -161,7 +161,7 @@ router.post('/filter/save', function (req, res) {
 
 router.post('/filter/delete', function (req, res) {
     let note = req.body;
-    let filterArchive = knex("FILTER").where("ID", "=", note.ID)
+    let filterArchive = knex("FILTER").where("ID", "=", filter.ID).del()
         .update({
             STATUS: 'archived'
         });
